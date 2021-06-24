@@ -1,4 +1,4 @@
-pub const WINDOW_WIDTH: i32 = 1024;
+pub const WINDOW_WIDTH: i32 = 640;
 pub const WINDOW_HEIGHT: i32 = 512;
 pub const CELL_SIZE: i32 = 4;
 pub const COLUMN_COUNT: i32 = WINDOW_WIDTH / CELL_SIZE;
