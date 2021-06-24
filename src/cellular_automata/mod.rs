@@ -5,6 +5,16 @@ use ::rand::Rng;
 use cell::*;
 use grid::*;
 
+pub fn automata() -> Conf {
+    Conf {
+        window_title: "AUTOMATA".to_owned(),
+        window_width: WINDOW_WIDTH,
+        window_height: WINDOW_HEIGHT,
+        fullscreen: false,
+        ..Default::default()
+    }
+}
+
 fn get_live_neighbour_count(cell: Cell, grid: &Vec<Vec<Cell>>) -> i32 {
     let mut neighbour_count: i32 = 0;
     for i in 0..8 {
@@ -50,10 +60,6 @@ fn cell_swap(cell: &mut Cell) {
 pub async fn run() {
     let mut rng = ::rand::thread_rng();
 
-    const CELL_SIZE: f32 = 10.0;
-    let row_count = screen_height() / CELL_SIZE;
-    let column_count = screen_width() / CELL_SIZE;
-
     let mut grid: Vec<Vec<Cell>> = Vec::new();
 
     for row in 0..ROW_COUNT {
@@ -70,15 +76,15 @@ pub async fn run() {
     loop {
         clear_background(WHITE);
 
-        for row in 0..row_count as usize {
-            for column in 0..column_count as usize {
+        for row in 0..ROW_COUNT as usize {
+            for column in 0..COLUMN_COUNT as usize {
                 let cell: Cell = grid[row as usize][column as usize];
                 if cell.current_state == 1 {
                     draw_rectangle(
-                        column as f32 * CELL_SIZE,
-                        row as f32 * CELL_SIZE,
-                        CELL_SIZE,
-                        CELL_SIZE,
+                        column as f32 * CELL_SIZE as f32,
+                        row as f32 * CELL_SIZE as f32,
+                        CELL_SIZE as f32,
+                        CELL_SIZE as f32,
                         BLACK,
                     );
                 }
@@ -92,8 +98,8 @@ pub async fn run() {
             }
         }
 
-        for row in 0..row_count as usize {
-            for column in 0..column_count as usize {
+        for row in 0..ROW_COUNT as usize {
+            for column in 0..COLUMN_COUNT as usize {
                 cell_swap(&mut grid[row as usize][column as usize]);
             }
         }
