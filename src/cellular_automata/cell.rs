@@ -45,13 +45,15 @@ impl fmt::Display for Cell {
     }
 }
 
-pub fn create_cell() -> Cell {
-    Cell {
-        position: Point { x: 0, y: 0 },
-        neighbours: calculate_neighbours(0, 0),
-        current_state: 0,
-        future_state: 0,
-        on_count: 0,
+impl Cell {
+    pub fn new(x: i32, y: i32, current_state: i32) -> Self {
+        Self {
+            position: Point { x, y },
+            neighbours: calculate_neighbours(x, y),
+            current_state,
+            future_state: 0,
+            on_count: 0,
+        }
     }
 }
 

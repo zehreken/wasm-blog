@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
+use macroquad::rand::*;
 mod cell;
 mod grid;
-use ::rand::Rng;
 use cell::*;
 use grid::*;
 
@@ -58,18 +58,15 @@ fn cell_swap(cell: &mut Cell) {
 }
 
 pub async fn run() {
-    let mut rng = ::rand::thread_rng();
+    // let mut rng = ::rand::thread_rng();
 
     let mut grid: Vec<Vec<Cell>> = Vec::new();
 
     for row in 0..ROW_COUNT {
         grid.push(Vec::new());
         for column in 0..COLUMN_COUNT {
-            grid[row as usize].push(create_cell());
-            grid[row as usize][column as usize].position = Point { x: column, y: row };
-            grid[row as usize][column as usize].neighbours = calculate_neighbours(column, row);
-            grid[row as usize][column as usize].current_state =
-                if rng.gen_range(0..2) < 1 { 0 } else { 1 };
+            let random_state = if rand::gen_range(0, 2) < 1 { 0 } else { 1 };
+            grid[row as usize].push(Cell::new(column, row, random_state));
         }
     }
 
