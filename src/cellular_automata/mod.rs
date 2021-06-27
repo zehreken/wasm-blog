@@ -1,8 +1,12 @@
 use macroquad::prelude::*;
 mod cell;
 mod config;
+use crate::fps_utils;
 use cell::*;
 use config::*;
+use std::time::{Duration, Instant};
+
+use super::fps_utils::*;
 
 pub fn automata() -> Conf {
     Conf {
@@ -69,6 +73,9 @@ pub async fn run() {
         }
     }
 
+    let mut fps_counter = fps_utils::FpsCounter::new();
+    let mut now = Instant::now();
+
     loop {
         clear_background(WHITE);
 
@@ -100,7 +107,10 @@ pub async fn run() {
             }
         }
 
-        draw_text("fps: 30", 2.0, 10.0, 16.0, PINK);
+        let duration: Duration = Instant::now() - now;
+        let fps_count = fps_counter.tick(duration.as_millis());
+        draw_text(&format!("fps: {}", fps_count), 2.0, 10.0, 16.0, PINK);
+        now = Instant::now();
 
         next_frame().await
     }
