@@ -1,15 +1,6 @@
+use super::config::*;
 use std::fmt;
 
-const MOORE_DIRECTIONS: [Point; 8] = [
-    Point { x: -1, y: -1 },
-    Point { x: -1, y: 0 },
-    Point { x: -1, y: 1 },
-    Point { x: 0, y: 1 },
-    Point { x: 1, y: 1 },
-    Point { x: 1, y: 0 },
-    Point { x: 1, y: -1 },
-    Point { x: 0, y: -1 },
-];
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
     pub x: i32,
@@ -49,7 +40,7 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: calculate_neighbours(x, y),
+            neighbours: calculate_neighbors(x, y),
             current_state,
             future_state: 0,
             on_count: 0,
@@ -57,41 +48,41 @@ impl Cell {
     }
 }
 
-pub fn calculate_neighbours(x: i32, y: i32) -> [Point; 8] {
-    let neighbours: [Point; 8] = [
+pub fn calculate_neighbors(x: i32, y: i32) -> [Point; 8] {
+    let neighbors: [Point; 8] = [
         Point {
-            x: MOORE_DIRECTIONS[0].x + x,
-            y: MOORE_DIRECTIONS[0].y + y,
+            x: MOORE_NEIGHBORHOOD[0].x + x,
+            y: MOORE_NEIGHBORHOOD[0].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[1].x + x,
-            y: MOORE_DIRECTIONS[1].y + y,
+            x: MOORE_NEIGHBORHOOD[1].x + x,
+            y: MOORE_NEIGHBORHOOD[1].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[2].x + x,
-            y: MOORE_DIRECTIONS[2].y + y,
+            x: MOORE_NEIGHBORHOOD[2].x + x,
+            y: MOORE_NEIGHBORHOOD[2].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[3].x + x,
-            y: MOORE_DIRECTIONS[3].y + y,
+            x: MOORE_NEIGHBORHOOD[3].x + x,
+            y: MOORE_NEIGHBORHOOD[3].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[4].x + x,
-            y: MOORE_DIRECTIONS[4].y + y,
+            x: MOORE_NEIGHBORHOOD[4].x + x,
+            y: MOORE_NEIGHBORHOOD[4].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[5].x + x,
-            y: MOORE_DIRECTIONS[5].y + y,
+            x: MOORE_NEIGHBORHOOD[5].x + x,
+            y: MOORE_NEIGHBORHOOD[5].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[6].x + x,
-            y: MOORE_DIRECTIONS[6].y + y,
+            x: MOORE_NEIGHBORHOOD[6].x + x,
+            y: MOORE_NEIGHBORHOOD[6].y + y,
         },
         Point {
-            x: MOORE_DIRECTIONS[7].x + x,
-            y: MOORE_DIRECTIONS[7].y + y,
+            x: MOORE_NEIGHBORHOOD[7].x + x,
+            y: MOORE_NEIGHBORHOOD[7].y + y,
         },
     ];
 
-    neighbours
+    neighbors
 }

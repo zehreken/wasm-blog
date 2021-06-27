@@ -1,9 +1,8 @@
 use macroquad::prelude::*;
-use macroquad::rand::*;
 mod cell;
-mod grid;
+mod config;
 use cell::*;
-use grid::*;
+use config::*;
 
 pub fn automata() -> Conf {
     Conf {
