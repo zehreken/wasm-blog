@@ -2,7 +2,6 @@
 
 mod cellular_automata;
 use cellular_automata::*;
-mod fps_utils;
 
 #[macroquad::main(automata)]
 async fn main() {
