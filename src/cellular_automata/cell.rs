@@ -38,23 +38,23 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: calculate_neighbors(x, y),
+            neighbours: calculate_neighbours(x, y),
             current_state,
             future_state: 0,
         }
     }
 
-    pub fn tick(&mut self, live_neighbor_count: i32) {
+    pub fn tick(&mut self, live_neighbour_count: i32) {
         if self.current_state == 1 {
-            if live_neighbor_count < 2 {
+            if live_neighbour_count < 2 {
                 self.future_state = 0;
-            } else if live_neighbor_count == 2 || live_neighbor_count == 3 {
+            } else if live_neighbour_count == 2 || live_neighbour_count == 3 {
                 self.future_state = 1;
             } else {
                 self.future_state = 0;
             }
         } else {
-            if live_neighbor_count == 3 {
+            if live_neighbour_count == 3 {
                 self.future_state = 1;
             } else {
                 self.future_state = 0;
@@ -63,41 +63,41 @@ impl Cell {
     }
 }
 
-pub fn calculate_neighbors(x: i32, y: i32) -> [Point; 8] {
-    let neighbors: [Point; 8] = [
+pub fn calculate_neighbours(x: i32, y: i32) -> [Point; 8] {
+    let neighbours: [Point; 8] = [
         Point {
-            x: MOORE_NEIGHBORHOOD[0].x + x,
-            y: MOORE_NEIGHBORHOOD[0].y + y,
+            x: MOORE_NEIGHBOURHOOD[0].x + x,
+            y: MOORE_NEIGHBOURHOOD[0].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[1].x + x,
-            y: MOORE_NEIGHBORHOOD[1].y + y,
+            x: MOORE_NEIGHBOURHOOD[1].x + x,
+            y: MOORE_NEIGHBOURHOOD[1].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[2].x + x,
-            y: MOORE_NEIGHBORHOOD[2].y + y,
+            x: MOORE_NEIGHBOURHOOD[2].x + x,
+            y: MOORE_NEIGHBOURHOOD[2].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[3].x + x,
-            y: MOORE_NEIGHBORHOOD[3].y + y,
+            x: MOORE_NEIGHBOURHOOD[3].x + x,
+            y: MOORE_NEIGHBOURHOOD[3].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[4].x + x,
-            y: MOORE_NEIGHBORHOOD[4].y + y,
+            x: MOORE_NEIGHBOURHOOD[4].x + x,
+            y: MOORE_NEIGHBOURHOOD[4].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[5].x + x,
-            y: MOORE_NEIGHBORHOOD[5].y + y,
+            x: MOORE_NEIGHBOURHOOD[5].x + x,
+            y: MOORE_NEIGHBOURHOOD[5].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[6].x + x,
-            y: MOORE_NEIGHBORHOOD[6].y + y,
+            x: MOORE_NEIGHBOURHOOD[6].x + x,
+            y: MOORE_NEIGHBOURHOOD[6].y + y,
         },
         Point {
-            x: MOORE_NEIGHBORHOOD[7].x + x,
-            y: MOORE_NEIGHBORHOOD[7].y + y,
+            x: MOORE_NEIGHBOURHOOD[7].x + x,
+            y: MOORE_NEIGHBOURHOOD[7].y + y,
         },
     ];
 
-    neighbors
+    neighbours
 }
