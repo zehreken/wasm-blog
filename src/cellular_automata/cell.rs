@@ -61,6 +61,10 @@ impl Cell {
             }
         }
     }
+
+    pub fn swap(&mut self) {
+        self.current_state = self.future_state;
+    }
 }
 
 pub fn calculate_neighbours(x: i32, y: i32) -> [Point; 8] {

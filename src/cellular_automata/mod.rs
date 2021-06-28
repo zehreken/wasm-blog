@@ -31,10 +31,6 @@ fn get_live_neighbour_count(cell: Cell, grid: &Vec<Vec<Cell>>) -> i32 {
     neighbour_count
 }
 
-fn cell_swap(cell: &mut Cell) {
-    cell.current_state = cell.future_state;
-}
-
 pub async fn run() {
     // let mut rng = ::rand::thread_rng();
 
@@ -72,7 +68,7 @@ pub async fn run() {
 
         for row in 0..ROW_COUNT as usize {
             for column in 0..COLUMN_COUNT as usize {
-                cell_swap(&mut grid[row as usize][column as usize]);
+                grid[row as usize][column as usize].swap();
             }
         }
 
