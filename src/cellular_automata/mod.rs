@@ -31,27 +31,6 @@ fn get_live_neighbour_count(cell: Cell, grid: &Vec<Vec<Cell>>) -> i32 {
     neighbour_count
 }
 
-fn cell_tick(cell: &mut Cell, live_neighbour_count: i32) {
-    if cell.current_state == 1 {
-        if live_neighbour_count < 2 {
-            cell.future_state = 0;
-            cell.on_count = 0;
-        } else if live_neighbour_count == 2 || live_neighbour_count == 3 {
-            cell.future_state = 1;
-            cell.on_count += 1;
-        } else {
-            cell.future_state = 0;
-            cell.on_count = 0;
-        }
-    } else {
-        if live_neighbour_count == 3 {
-            cell.future_state = 1;
-        } else {
-            cell.future_state = 0;
-        }
-    }
-}
-
 fn cell_swap(cell: &mut Cell) {
     cell.current_state = cell.future_state;
 }
@@ -87,10 +66,7 @@ pub async fn run() {
 
                 let live_neighbour_count: i32 =
                     get_live_neighbour_count(grid[row as usize][column as usize], &grid);
-                cell_tick(
-                    &mut grid[row as usize][column as usize],
-                    live_neighbour_count,
-                );
+                grid[row as usize][column as usize].tick(live_neighbour_count);
             }
         }
 
@@ -100,7 +76,13 @@ pub async fn run() {
             }
         }
 
-        draw_text(&format!("fps: {}", macroquad::time::get_fps()), 2.0, 12.0, 16.0, PINK);
+        draw_text(
+            &format!("fps: {}", macroquad::time::get_fps()),
+            2.0,
+            12.0,
+            16.0,
+            PINK,
+        );
 
         next_frame().await
     }

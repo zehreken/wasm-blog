@@ -19,7 +19,6 @@ pub struct Cell {
     pub neighbours: [Point; 8],
     pub current_state: i32,
     pub future_state: i32,
-    pub on_count: i32,
 }
 
 impl fmt::Display for Cell {
@@ -31,8 +30,7 @@ impl fmt::Display for Cell {
         }
         writeln!(f, "]")?;
         writeln!(f, "current_state: {}", self.current_state)?;
-        writeln!(f, "future_state: {}", self.future_state)?;
-        writeln!(f, "on_count: {}", self.on_count)
+        writeln!(f, "future_state: {}", self.future_state)
     }
 }
 
@@ -43,7 +41,24 @@ impl Cell {
             neighbours: calculate_neighbors(x, y),
             current_state,
             future_state: 0,
-            on_count: 0,
+        }
+    }
+
+    pub fn tick(&mut self, live_neighbor_count: i32) {
+        if self.current_state == 1 {
+            if live_neighbor_count < 2 {
+                self.future_state = 0;
+            } else if live_neighbor_count == 2 || live_neighbor_count == 3 {
+                self.future_state = 1;
+            } else {
+                self.future_state = 0;
+            }
+        } else {
+            if live_neighbor_count == 3 {
+                self.future_state = 1;
+            } else {
+                self.future_state = 0;
+            }
         }
     }
 }
