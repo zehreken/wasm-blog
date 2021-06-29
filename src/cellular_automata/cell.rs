@@ -65,6 +65,24 @@ impl Cell {
     pub fn swap(&mut self) {
         self.current_state = self.future_state;
     }
+
+    pub fn get_live_neighbour_count(&self, grid: &Vec<Vec<Cell>>) -> i32 {
+        let mut neighbour_count: i32 = 0;
+        for i in 0..8 {
+            if self.neighbours[i].x >= 0
+                && self.neighbours[i].x < COLUMN_COUNT
+                && self.neighbours[i].y >= 0
+                && self.neighbours[i].y < ROW_COUNT
+            {
+                let current_state = grid[self.neighbours[i].y as usize]
+                    [self.neighbours[i].x as usize]
+                    .current_state;
+                neighbour_count += current_state;
+            }
+        }
+
+        neighbour_count
+    }
 }
 
 pub fn calculate_neighbours(x: i32, y: i32) -> [Point; 8] {

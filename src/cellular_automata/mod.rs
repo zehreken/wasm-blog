@@ -14,26 +14,7 @@ pub fn automata() -> Conf {
     }
 }
 
-fn get_live_neighbour_count(cell: Cell, grid: &Vec<Vec<Cell>>) -> i32 {
-    let mut neighbour_count: i32 = 0;
-    for i in 0..8 {
-        if cell.neighbours[i].x >= 0
-            && cell.neighbours[i].x < COLUMN_COUNT
-            && cell.neighbours[i].y >= 0
-            && cell.neighbours[i].y < ROW_COUNT
-        {
-            let current_state =
-                grid[cell.neighbours[i].y as usize][cell.neighbours[i].x as usize].current_state;
-            neighbour_count += current_state;
-        }
-    }
-
-    neighbour_count
-}
-
 pub async fn run() {
-    // let mut rng = ::rand::thread_rng();
-
     let mut grid: Vec<Vec<Cell>> = Vec::new();
 
     for row in 0..ROW_COUNT {
@@ -60,8 +41,7 @@ pub async fn run() {
                     );
                 }
 
-                let live_neighbour_count: i32 =
-                    get_live_neighbour_count(grid[row as usize][column as usize], &grid);
+                let live_neighbour_count: i32 = cell.get_live_neighbour_count(&grid);
                 grid[row as usize][column as usize].tick(live_neighbour_count);
             }
         }
