@@ -38,7 +38,7 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: calculate_neighbours(x, y),
+            neighbours: get_moore_neighbours(x, y),
             current_state,
             future_state: 0,
         }
@@ -89,7 +89,11 @@ impl Cell {
     }
 }
 
-pub fn calculate_neighbours(x: i32, y: i32) -> [Point; 8] {
+pub fn get_von_neumann_neighbours() {
+    unimplemented!()
+}
+
+pub fn get_moore_neighbours(x: i32, y: i32) -> [Point; 8] {
     let neighbours: [Point; 8] = [
         Point {
             x: MOORE_NEIGHBOURHOOD[0].x + x,
