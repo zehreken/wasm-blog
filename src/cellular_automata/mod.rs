@@ -31,7 +31,7 @@ pub async fn run() {
         for row in 0..ROW_COUNT as usize {
             for column in 0..COLUMN_COUNT as usize {
                 let cell: Cell = grid[row as usize][column as usize];
-                if cell.current_state == 1 {
+                if cell.get_current_state() == 1 {
                     draw_rectangle(
                         column as f32 * CELL_SIZE as f32,
                         row as f32 * CELL_SIZE as f32,

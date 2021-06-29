@@ -15,10 +15,10 @@ impl fmt::Display for Point {
 
 #[derive(Debug, Copy, Clone)]
 pub struct Cell {
-    pub position: Point,
-    pub neighbours: [Point; 8],
-    pub current_state: i32,
-    pub future_state: i32,
+    position: Point,
+    neighbours: [Point; 8],
+    current_state: i32,
+    future_state: i32,
 }
 
 impl fmt::Display for Cell {
@@ -82,6 +82,10 @@ impl Cell {
         }
 
         neighbour_count
+    }
+
+    pub fn get_current_state(&self) -> i32 {
+        self.current_state
     }
 }
 
