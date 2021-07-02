@@ -38,8 +38,8 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            // neighbours: get_moore_neighbours(x, y),
-            neighbours: get_von_neumann_neighbours(x, y),
+            neighbours: get_moore_neighbours(x, y),
+            // neighbours: get_von_neumann_neighbours(x, y),
             current_state,
             future_state: 0,
         }
@@ -90,62 +90,34 @@ impl Cell {
     }
 }
 
+pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
+    unimplemented!();
+    let n = r * 4;
+    let mut neighbours: Vec<Point> = Vec::new();
+
+    // |y1 – y2| + |x1 – x2| Taxicab distance formula
+}
+
 pub fn get_von_neumann_neighbours(x: i32, y: i32) -> Vec<Point> {
     let mut neighbours: Vec<Point> = Vec::new();
-    neighbours.push(Point {
-        x: VON_NEUMANN_NEIGHBOURHOOD[0].x + x,
-        y: VON_NEUMANN_NEIGHBOURHOOD[0].y + y,
-    });
-    neighbours.push(Point {
-        x: VON_NEUMANN_NEIGHBOURHOOD[1].x + x,
-        y: VON_NEUMANN_NEIGHBOURHOOD[1].y + y,
-    });
-    neighbours.push(Point {
-        x: VON_NEUMANN_NEIGHBOURHOOD[2].x + x,
-        y: VON_NEUMANN_NEIGHBOURHOOD[2].y + y,
-    });
-    neighbours.push(Point {
-        x: VON_NEUMANN_NEIGHBOURHOOD[3].x + x,
-        y: VON_NEUMANN_NEIGHBOURHOOD[3].y + y,
-    });
+    for i in 0..VON_NEUMANN_NEIGHBOURHOOD.len() {
+        neighbours.push(Point {
+            x: VON_NEUMANN_NEIGHBOURHOOD[i].x + x,
+            y: VON_NEUMANN_NEIGHBOURHOOD[i].y + y,
+        });
+    }
 
     neighbours
 }
 
 pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
     let mut neighbours: Vec<Point> = Vec::new();
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[0].x + x,
-        y: MOORE_NEIGHBOURHOOD[0].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[1].x + x,
-        y: MOORE_NEIGHBOURHOOD[1].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[2].x + x,
-        y: MOORE_NEIGHBOURHOOD[2].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[3].x + x,
-        y: MOORE_NEIGHBOURHOOD[3].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[4].x + x,
-        y: MOORE_NEIGHBOURHOOD[4].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[5].x + x,
-        y: MOORE_NEIGHBOURHOOD[5].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[6].x + x,
-        y: MOORE_NEIGHBOURHOOD[6].y + y,
-    });
-    neighbours.push(Point {
-        x: MOORE_NEIGHBOURHOOD[7].x + x,
-        y: MOORE_NEIGHBOURHOOD[7].y + y,
-    });
+    for i in 0..MOORE_NEIGHBOURHOOD.len() {
+        neighbours.push(Point {
+            x: MOORE_NEIGHBOURHOOD[i].x + x,
+            y: MOORE_NEIGHBOURHOOD[i].y + y,
+        });
+    }
 
     neighbours
 }
