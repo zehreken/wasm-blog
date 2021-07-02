@@ -13,10 +13,10 @@ impl fmt::Display for Point {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct Cell {
     position: Point,
-    neighbours: [Point; 8],
+    neighbours: Vec<Point>,
     current_state: i32,
     future_state: i32,
 }
@@ -38,7 +38,8 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: get_moore_neighbours(x, y),
+            // neighbours: get_moore_neighbours(x, y),
+            neighbours: get_von_neumann_neighbours(x, y),
             current_state,
             future_state: 0,
         }
@@ -68,7 +69,7 @@ impl Cell {
 
     pub fn get_live_neighbour_count(&self, grid: &Vec<Vec<Cell>>) -> i32 {
         let mut neighbour_count: i32 = 0;
-        for i in 0..8 {
+        for i in 0..self.neighbours.len() {
             if self.neighbours[i].x >= 0
                 && self.neighbours[i].x < COLUMN_COUNT
                 && self.neighbours[i].y >= 0
@@ -89,45 +90,62 @@ impl Cell {
     }
 }
 
-pub fn get_von_neumann_neighbours() {
-    unimplemented!()
+pub fn get_von_neumann_neighbours(x: i32, y: i32) -> Vec<Point> {
+    let mut neighbours: Vec<Point> = Vec::new();
+    neighbours.push(Point {
+        x: VON_NEUMANN_NEIGHBOURHOOD[0].x + x,
+        y: VON_NEUMANN_NEIGHBOURHOOD[0].y + y,
+    });
+    neighbours.push(Point {
+        x: VON_NEUMANN_NEIGHBOURHOOD[1].x + x,
+        y: VON_NEUMANN_NEIGHBOURHOOD[1].y + y,
+    });
+    neighbours.push(Point {
+        x: VON_NEUMANN_NEIGHBOURHOOD[2].x + x,
+        y: VON_NEUMANN_NEIGHBOURHOOD[2].y + y,
+    });
+    neighbours.push(Point {
+        x: VON_NEUMANN_NEIGHBOURHOOD[3].x + x,
+        y: VON_NEUMANN_NEIGHBOURHOOD[3].y + y,
+    });
+
+    neighbours
 }
 
-pub fn get_moore_neighbours(x: i32, y: i32) -> [Point; 8] {
-    let neighbours: [Point; 8] = [
-        Point {
-            x: MOORE_NEIGHBOURHOOD[0].x + x,
-            y: MOORE_NEIGHBOURHOOD[0].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[1].x + x,
-            y: MOORE_NEIGHBOURHOOD[1].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[2].x + x,
-            y: MOORE_NEIGHBOURHOOD[2].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[3].x + x,
-            y: MOORE_NEIGHBOURHOOD[3].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[4].x + x,
-            y: MOORE_NEIGHBOURHOOD[4].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[5].x + x,
-            y: MOORE_NEIGHBOURHOOD[5].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[6].x + x,
-            y: MOORE_NEIGHBOURHOOD[6].y + y,
-        },
-        Point {
-            x: MOORE_NEIGHBOURHOOD[7].x + x,
-            y: MOORE_NEIGHBOURHOOD[7].y + y,
-        },
-    ];
+pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
+    let mut neighbours: Vec<Point> = Vec::new();
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[0].x + x,
+        y: MOORE_NEIGHBOURHOOD[0].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[1].x + x,
+        y: MOORE_NEIGHBOURHOOD[1].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[2].x + x,
+        y: MOORE_NEIGHBOURHOOD[2].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[3].x + x,
+        y: MOORE_NEIGHBOURHOOD[3].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[4].x + x,
+        y: MOORE_NEIGHBOURHOOD[4].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[5].x + x,
+        y: MOORE_NEIGHBOURHOOD[5].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[6].x + x,
+        y: MOORE_NEIGHBOURHOOD[6].y + y,
+    });
+    neighbours.push(Point {
+        x: MOORE_NEIGHBOURHOOD[7].x + x,
+        y: MOORE_NEIGHBOURHOOD[7].y + y,
+    });
 
     neighbours
 }
