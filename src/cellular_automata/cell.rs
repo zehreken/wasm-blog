@@ -38,7 +38,8 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: get_moore_neighbours(x, y),
+            neighbours: get_taxicab_neighbours(x, y, 1),
+            // neighbours: get_moore_neighbours(x, y),
             // neighbours: get_von_neumann_neighbours(x, y),
             current_state,
             future_state: 0,
@@ -91,11 +92,25 @@ impl Cell {
 }
 
 pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
-    unimplemented!();
-    let n = r * 4;
+    if r <= 0 {
+        panic!("wrong argument r");
+    }
     let mut neighbours: Vec<Point> = Vec::new();
 
-    // |y1 – y2| + |x1 – x2| Taxicab distance formula
+    // Taxicab distance |y1 – y2| + |x1 – x2|
+    let start_x = x - r;
+    let end_x = x + r;
+    let start_y = y - r;
+    let end_y = y + r;
+    for x_n in start_x..=end_x {
+        for y_n in start_y..=end_y {
+            if (y - y_n).abs() + (x - x_n).abs() <= r && !(y == y_n && x == x_n) {
+                neighbours.push(Point { x: x_n, y: y_n });
+            }
+        }
+    }
+
+    neighbours
 }
 
 pub fn get_von_neumann_neighbours(x: i32, y: i32) -> Vec<Point> {
