@@ -38,9 +38,8 @@ impl Cell {
     pub fn new(x: i32, y: i32, current_state: i32) -> Self {
         Self {
             position: Point { x, y },
-            neighbours: get_taxicab_neighbours(x, y, 1),
-            // neighbours: get_moore_neighbours(x, y),
-            // neighbours: get_von_neumann_neighbours(x, y),
+            // neighbours: get_taxicab_neighbours(x, y, 1),
+            neighbours: get_moore_neighbours(x, y),
             current_state,
             future_state: 0,
         }
@@ -48,9 +47,11 @@ impl Cell {
 
     pub fn tick(&mut self, live_neighbour_count: i32) {
         if self.current_state == 1 {
-            if live_neighbour_count < 2 {
+            if live_neighbour_count < 2 + LIVE_NEIGHBOUR_FACTOR {
                 self.future_state = 0;
-            } else if live_neighbour_count == 2 || live_neighbour_count == 3 {
+            } else if live_neighbour_count == 2 + LIVE_NEIGHBOUR_FACTOR
+                || live_neighbour_count == 3 + LIVE_NEIGHBOUR_FACTOR
+            {
                 self.future_state = 1;
             } else {
                 self.future_state = 0;
@@ -114,15 +115,7 @@ pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
 }
 
 pub fn get_von_neumann_neighbours(x: i32, y: i32) -> Vec<Point> {
-    let mut neighbours: Vec<Point> = Vec::new();
-    for i in 0..VON_NEUMANN_NEIGHBOURHOOD.len() {
-        neighbours.push(Point {
-            x: VON_NEUMANN_NEIGHBOURHOOD[i].x + x,
-            y: VON_NEUMANN_NEIGHBOURHOOD[i].y + y,
-        });
-    }
-
-    neighbours
+    get_taxicab_neighbours(x, y, 1)
 }
 
 pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
