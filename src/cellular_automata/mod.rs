@@ -42,7 +42,10 @@ pub async fn run() {
                 }
 
                 let live_neighbour_count: i32 = cell.get_live_neighbour_count(&grid);
-                grid[row as usize][column as usize].tick(live_neighbour_count);
+
+                // Borrow cell mutably
+                let cell = &mut grid[row as usize][column as usize];
+                cell.tick(live_neighbour_count);
             }
         }
 
