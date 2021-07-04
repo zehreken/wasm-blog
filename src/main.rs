@@ -1,10 +1,10 @@
 // cargo build --release --target wasm32-unknown-unknown
 
-mod cellular_automata;
-use cellular_automata::*;
+mod life;
+use life::*;
 
 #[macroquad::main(automata)]
 async fn main() {
-    let future = cellular_automata::run();
+    let future = life::run();
     future.await
 }

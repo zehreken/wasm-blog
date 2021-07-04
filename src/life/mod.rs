@@ -6,7 +6,7 @@ use config::*;
 
 pub fn automata() -> Conf {
     Conf {
-        window_title: "AUTOMATA".to_owned(),
+        window_title: "Life".to_owned(),
         window_width: WINDOW_WIDTH,
         window_height: WINDOW_HEIGHT,
         fullscreen: false,
