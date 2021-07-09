@@ -4,7 +4,7 @@ mod config;
 use cell::*;
 use config::*;
 
-pub fn automata() -> Conf {
+pub fn get_config() -> Conf {
     Conf {
         window_title: "Life".to_owned(),
         window_width: WINDOW_WIDTH,
