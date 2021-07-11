@@ -16,13 +16,13 @@ pub async fn run() {
     loop {
         clear_background(WHITE);
 
-        let rotation = 0.05 * macroquad::time::get_time() as f32;
+        let rotation = 10.0 * macroquad::time::get_time() as f32;
         let gear_ratio = FRONT_GEAR_SIZE / REAR_GEAR_SIZE;
-        draw_wheel(200.0, 256.0, 100.0, rotation * FRONT_GEAR_SIZE);
+        draw_wheel(200.0, 256.0, 100.0, rotation / REAR_GEAR_SIZE);
 
-        draw_circle_with_line(200.0, 256.0, REAR_GEAR_SIZE, rotation * FRONT_GEAR_SIZE);
+        draw_circle_with_line(200.0, 256.0, REAR_GEAR_SIZE, rotation / REAR_GEAR_SIZE);
 
-        draw_circle_with_line(400.0, 256.0, FRONT_GEAR_SIZE, rotation * REAR_GEAR_SIZE);
+        draw_circle_with_line(400.0, 256.0, FRONT_GEAR_SIZE, rotation / FRONT_GEAR_SIZE);
 
         draw_text(
             &format!("fps: {}", macroquad::time::get_fps()),
