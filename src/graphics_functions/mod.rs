@@ -1,5 +1,6 @@
 use macroquad::prelude::*;
 mod f_sign;
+mod f_smoothstep;
 
 pub fn get_config() -> Conf {
     Conf {
@@ -34,6 +35,7 @@ pub async fn run() {
         function: Function::Mod,
     };
     let mut f_sign = f_sign::Model::new();
+    let mut f_smoothstep = f_smoothstep::Model::new();
 
     loop {
         clear_background(WHITE);
@@ -53,9 +55,14 @@ pub async fn run() {
                             ui.selectable_value(&mut model.function, f, format!("{:?}", f));
                         }
                     });
-                f_sign.draw(ui);
+                match model.function {
+                    Function::Mod => {}
+                    Function::Sign => f_sign.draw(ui),
+                    Function::SmoothStep => f_smoothstep.draw(ui),
+                    _ => {}
+                }
             });
-            egui::Window::new("add title").show(egui_ctx, |ui| {
+            egui::Window::new(format!("{:?}", model.function)).show(egui_ctx, |ui| {
                 f_sign.draw(ui);
             });
         });

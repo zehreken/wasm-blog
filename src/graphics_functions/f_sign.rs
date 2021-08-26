@@ -7,7 +7,6 @@ impl Model {
     pub fn new() -> Self {
         Self { slider_value: 0.0 }
     }
-    pub fn update(&mut self) {}
 
     pub fn draw(&mut self, ui: &mut Ui) {
         let min = -10.0;
