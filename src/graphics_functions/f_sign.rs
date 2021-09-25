@@ -9,10 +9,9 @@ impl Model {
     }
 
     pub fn draw(&mut self, ui: &mut Ui) {
-        let min = -10.0;
-        let max = 10.0;
+        let range = -10.0..=10.0;
         ui.add(
-            Slider::new(&mut self.slider_value, min..=max)
+            Slider::new(&mut self.slider_value, range)
                 .logarithmic(false)
                 .clamp_to_range(false)
                 .smart_aim(false),

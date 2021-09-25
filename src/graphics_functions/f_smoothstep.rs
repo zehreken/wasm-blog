@@ -16,24 +16,23 @@ impl Model {
     }
 
     pub fn draw(&mut self, ui: &mut Ui) {
-        let min = -10.0;
-        let max = 10.0;
+        let range = -10.0..=10.0;
         ui.add(
-            Slider::new(&mut self.lower_edge, min..=max)
+            Slider::new(&mut self.lower_edge, range.clone())
                 .logarithmic(false)
                 .clamp_to_range(false)
                 .smart_aim(false)
                 .text("lower edge"),
         );
         ui.add(
-            Slider::new(&mut self.upper_edge, min..=max)
+            Slider::new(&mut self.upper_edge, range.clone())
                 .logarithmic(false)
                 .clamp_to_range(false)
                 .smart_aim(false)
                 .text("upper edge"),
         );
         ui.add(
-            Slider::new(&mut self.x, min..=max)
+            Slider::new(&mut self.x, range)
                 .logarithmic(false)
                 .clamp_to_range(false)
                 .smart_aim(false)

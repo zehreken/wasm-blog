@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+mod f_mod;
 mod f_sign;
 mod f_smoothstep;
 
@@ -34,6 +35,7 @@ pub async fn run() {
     let mut model = Model {
         function: Function::Mod,
     };
+    let mut f_mod = f_mod::Model::new();
     let mut f_sign = f_sign::Model::new();
     let mut f_smoothstep = f_smoothstep::Model::new();
 
@@ -56,15 +58,16 @@ pub async fn run() {
                         }
                     });
                 match model.function {
-                    Function::Mod => {}
+                    Function::Mod => f_mod.draw(ui),
                     Function::Sign => f_sign.draw(ui),
                     Function::SmoothStep => f_smoothstep.draw(ui),
                     _ => {}
                 }
             });
-            egui::Window::new(format!("{:?}", model.function)).show(egui_ctx, |ui| {
-                f_sign.draw(ui);
-            });
+            // TODO: Remove later
+            // egui::Window::new(format!("{:?}", model.function)).show(egui_ctx, |ui| {
+            //     f_sign.draw(ui);
+            // });
         });
 
         // Draw things before egui
