@@ -2,6 +2,8 @@ use macroquad::prelude::*;
 mod f_mod;
 mod f_sign;
 mod f_smoothstep;
+mod traits;
+use traits::View;
 
 pub fn get_config() -> Conf {
     Conf {

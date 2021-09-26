@@ -1,3 +1,4 @@
+use super::traits::View;
 use egui::*;
 
 pub struct Model {
@@ -14,8 +15,12 @@ impl Model {
             x: 0.0,
         }
     }
+}
 
-    pub fn draw_ui(&mut self, ui: &mut Ui) {
+impl View for Model {
+    fn draw(&mut self) {}
+
+    fn draw_ui(&mut self, ui: &mut Ui) {
         let range = -10.0..=10.0;
         ui.add(
             Slider::new(&mut self.lower_edge, range.clone())
