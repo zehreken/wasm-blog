@@ -58,9 +58,9 @@ pub async fn run() {
                         }
                     });
                 match model.function {
-                    Function::Mod => f_mod.draw(ui),
-                    Function::Sign => f_sign.draw(ui),
-                    Function::SmoothStep => f_smoothstep.draw(ui),
+                    Function::Mod => f_mod.draw_ui(ui),
+                    Function::Sign => f_sign.draw_ui(ui),
+                    Function::SmoothStep => f_smoothstep.draw_ui(ui),
                     _ => {}
                 }
             });

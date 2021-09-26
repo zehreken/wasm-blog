@@ -8,7 +8,7 @@ impl Model {
         Self { slider_value: 0.0 }
     }
 
-    pub fn draw(&mut self, ui: &mut Ui) {
+    pub fn draw_ui(&mut self, ui: &mut Ui) {
         let range = -10.0..=10.0;
         ui.add(
             Slider::new(&mut self.slider_value, range)

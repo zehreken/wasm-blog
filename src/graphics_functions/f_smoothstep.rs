@@ -15,7 +15,7 @@ impl Model {
         }
     }
 
-    pub fn draw(&mut self, ui: &mut Ui) {
+    pub fn draw_ui(&mut self, ui: &mut Ui) {
         let range = -10.0..=10.0;
         ui.add(
             Slider::new(&mut self.lower_edge, range.clone())
