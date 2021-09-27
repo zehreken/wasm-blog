@@ -46,6 +46,12 @@ pub async fn run() {
 
         // Process keys, mouse etc.
 
+        match model.function {
+            Function::Mod => f_mod.draw(),
+            Function::Sign => f_sign.draw(),
+            Function::SmoothStep => f_smoothstep.draw(),
+        }
+
         egui_macroquad::ui(|egui_ctx| {
             egui::SidePanel::left("").show(egui_ctx, |ui| {
                 // ui.horizontal(|ui| {
@@ -63,7 +69,6 @@ pub async fn run() {
                     Function::Mod => f_mod.draw_ui(ui),
                     Function::Sign => f_sign.draw_ui(ui),
                     Function::SmoothStep => f_smoothstep.draw_ui(ui),
-                    _ => {}
                 }
             });
             // TODO: Remove later

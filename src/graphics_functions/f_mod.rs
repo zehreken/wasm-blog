@@ -1,5 +1,6 @@
 use super::traits::View;
 use egui::*;
+use macroquad::prelude::*;
 
 pub struct Model {
     param_1: f32,
@@ -16,7 +17,15 @@ impl Model {
 }
 
 impl View for Model {
-    fn draw(&mut self) {}
+    fn draw(&mut self) {
+        draw_text(
+            &format!("fps: {}", macroquad::time::get_fps()),
+            400.0,
+            12.0,
+            16.0,
+            PINK,
+        );
+    }
 
     fn draw_ui(&mut self, ui: &mut Ui) {
         let range = -10.0..=10.0;
