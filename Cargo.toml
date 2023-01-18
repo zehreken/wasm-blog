@@ -7,6 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-macroquad = "=0.3.10"
-egui-macroquad = "0.6.1"
-egui = "0.14.2"
+macroquad = "=0.3.24"
+egui-macroquad = "0.12.0"
+egui = "0.19.0"
