@@ -11,8 +11,8 @@ impl Fauna {
         }
     }
 
-    pub fn update(&self, delta_time: f32) {
-        for cell in self.cells {
+    pub fn update(&mut self, delta_time: f32) {
+        for cell in &mut self.cells {
             cell.update(delta_time);
         }
     }

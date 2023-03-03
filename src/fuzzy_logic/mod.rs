@@ -1,5 +1,6 @@
 mod cell;
 mod fauna;
+mod utils;
 use macroquad::prelude::*;
 
 pub fn get_config() -> Conf {
@@ -13,7 +14,8 @@ pub fn get_config() -> Conf {
 }
 
 pub async fn run() {
-    let fauna = fauna::Fauna::new();
+    let mut fauna = fauna::Fauna::new();
+
     loop {
         clear_background(WHITE);
 
