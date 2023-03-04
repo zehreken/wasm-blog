@@ -1,13 +1,18 @@
-use super::cell::Cell;
+use macroquad::{prelude::*, ui::root_ui};
+
+use super::cell::*;
 
 pub struct Fauna {
-    cells: [Cell; 10],
+    cells: Vec<Cell>,
+    big_cell: BigCell,
 }
 
 impl Fauna {
     pub fn new() -> Self {
+        let cells: Vec<Cell> = (0..10).map(|i| Cell::new(i, RED)).collect();
         Self {
-            cells: [Cell::new(20_f32); 10],
+            cells,
+            big_cell: BigCell::new(50_f32, BLUE),
         }
     }
 
@@ -15,11 +20,37 @@ impl Fauna {
         for cell in &mut self.cells {
             cell.update(delta_time);
         }
+        self.big_cell.update(delta_time, &mut self.cells);
     }
 
     pub fn draw(&self) {
-        for cell in self.cells {
+        for cell in &self.cells {
             cell.draw();
+        }
+        self.big_cell.draw();
+    }
+
+    pub fn ui(&mut self) {
+        root_ui().label(None, &format!("fps: {}", macroquad::time::get_fps()));
+        root_ui().label(
+            None,
+            &format!("distance weight {}", self.big_cell.get_distance_weight()),
+        );
+        if root_ui().button(None, "-") {
+            self.big_cell.set_distance_weight(-0.1);
+        }
+        if root_ui().button(None, "+") {
+            self.big_cell.set_distance_weight(0.1);
+        }
+        root_ui().label(
+            None,
+            &format!("size weight {}", self.big_cell.get_size_weight()),
+        );
+        if root_ui().button(None, "-") {
+            self.big_cell.set_size_weight(-0.1);
+        }
+        if root_ui().button(None, "+") {
+            self.big_cell.set_size_weight(0.1);
         }
     }
 }

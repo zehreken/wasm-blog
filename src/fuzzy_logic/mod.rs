@@ -23,13 +23,7 @@ pub async fn run() {
 
         fauna.draw();
 
-        draw_text(
-            &format!("fps: {}", macroquad::time::get_fps()),
-            2.0,
-            12.0,
-            16.0,
-            PINK,
-        );
+        fauna.ui();
 
         next_frame().await
     }
