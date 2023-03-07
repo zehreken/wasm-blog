@@ -12,8 +12,8 @@ pub struct BigCell {
     target: Vec2,
     color: Color,
     size: f32,
-    distance_weight: f32,
-    size_weight: f32,
+    pub distance_weight: f32,
+    pub size_weight: f32,
 }
 
 impl BigCell {
@@ -77,22 +77,6 @@ impl BigCell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_circle_lines(x, y, self.size, 3.0, self.color);
-    }
-
-    pub fn get_distance_weight(&self) -> f32 {
-        self.distance_weight
-    }
-
-    pub fn set_distance_weight(&mut self, value: f32) {
-        self.distance_weight += value;
-    }
-
-    pub fn get_size_weight(&self) -> f32 {
-        self.size_weight
-    }
-
-    pub fn set_size_weight(&mut self, value: f32) {
-        self.size_weight += value;
     }
 }
 

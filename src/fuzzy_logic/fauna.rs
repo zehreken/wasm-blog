@@ -1,4 +1,8 @@
-use macroquad::{prelude::*, ui::root_ui};
+use macroquad::{
+    hash,
+    prelude::*,
+    ui::{root_ui, widgets::Group},
+};
 
 use super::cell::*;
 
@@ -31,26 +35,13 @@ impl Fauna {
     }
 
     pub fn ui(&mut self) {
-        root_ui().label(None, &format!("fps: {}", macroquad::time::get_fps()));
-        root_ui().label(
-            None,
-            &format!("distance weight {}", self.big_cell.get_distance_weight()),
-        );
-        if root_ui().button(None, "-") {
-            self.big_cell.set_distance_weight(-0.1);
-        }
-        if root_ui().button(None, "+") {
-            self.big_cell.set_distance_weight(0.1);
-        }
-        root_ui().label(
-            None,
-            &format!("size weight {}", self.big_cell.get_size_weight()),
-        );
-        if root_ui().button(None, "-") {
-            self.big_cell.set_size_weight(-0.1);
-        }
-        if root_ui().button(None, "+") {
-            self.big_cell.set_size_weight(0.1);
-        }
+        Group::new(hash!(), vec2(200.0, 120.0)).ui(&mut *root_ui(), |ui| {
+            ui.label(None, &format!("fps: {}", macroquad::time::get_fps()));
+            ui.label(None, "distance weight");
+            ui.slider(hash!(), "", 0.0..1.0, &mut self.big_cell.distance_weight);
+
+            ui.label(None, "size weight");
+            ui.slider(hash!(), "", 0.0..1.0, &mut self.big_cell.size_weight);
+        });
     }
 }
