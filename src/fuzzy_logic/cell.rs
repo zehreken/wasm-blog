@@ -1,9 +1,5 @@
 use super::utils::get_random_vector;
-use macroquad::{
-    prelude::*,
-    shapes::{draw_circle, draw_circle_lines},
-    text::draw_text,
-};
+use macroquad::{prelude::*, shapes::draw_circle_lines, text::draw_text};
 
 #[derive(Clone, Copy)]
 pub struct BigCell {
@@ -55,28 +51,28 @@ impl BigCell {
         }
 
         let mut temp = 0.0;
-        let mut targetId = 0;
+        let mut target_id = 0;
         for i in 0..10 {
             let prio = self.distance_weight * closeness[i] + self.size_weight * sizes[i];
             if prio > temp {
-                targetId = i;
+                target_id = i;
                 temp = prio;
             }
         }
 
         // println!("target {}", targetId);
-        self.target = cells[targetId].get_position();
+        self.target = cells[target_id].get_position();
         self.velocity = (self.target - self.position).normalize() * 30.0;
         self.position += self.velocity * delta_time;
 
         if (self.target - self.position).length_squared() < 1.0 {
-            cells[targetId].die();
+            cells[target_id].die();
         }
     }
 
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
-        draw_circle_lines(x, y, self.size, 3.0, self.color);
+        draw_circle_lines(x, y, self.size, 5.0, self.color);
     }
 }
 

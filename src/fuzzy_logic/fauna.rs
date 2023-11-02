@@ -13,10 +13,12 @@ pub struct Fauna {
 
 impl Fauna {
     pub fn new() -> Self {
-        let cells: Vec<Cell> = (0..10).map(|i| Cell::new(i, RED)).collect();
+        let cells: Vec<Cell> = (0..10)
+            .map(|i| Cell::new(i, Color::from_rgba(28, 28, 28, 255)))
+            .collect();
         Self {
             cells,
-            big_cell: BigCell::new(50_f32, BLUE),
+            big_cell: BigCell::new(50_f32, Color::from_rgba(255, 157, 11, 255)),
         }
     }
 
