@@ -73,9 +73,9 @@ impl Cell {
         let mut neighbour_count: i32 = 0;
         for i in 0..self.neighbours.len() {
             if self.neighbours[i].x >= 0
-                && self.neighbours[i].x < COLUMN_COUNT
+                && self.neighbours[i].x < grid[0].len() as i32
                 && self.neighbours[i].y >= 0
-                && self.neighbours[i].y < ROW_COUNT
+                && self.neighbours[i].y < grid.len() as i32
             {
                 let current_state = grid[self.neighbours[i].y as usize]
                     [self.neighbours[i].x as usize]
