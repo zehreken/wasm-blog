@@ -1,5 +1,3 @@
-use std::io::Read;
-
 use macroquad::{audio::*, prelude::*};
 const SIZE: usize = 1024 * 2;
 
@@ -32,7 +30,7 @@ pub async fn run() {
                 if ui.button("test").clicked() {
                     println!("test");
                     play_sound(
-                        sound,
+                        &sound,
                         PlaySoundParams {
                             looped: false,
                             volume: 1.0,
