@@ -1,10 +1,9 @@
+use super::cell::*;
 use macroquad::{
     hash,
     prelude::*,
     ui::{root_ui, widgets::Group},
 };
-
-use super::cell::*;
 
 pub struct Fauna {
     cells: Vec<Cell>,

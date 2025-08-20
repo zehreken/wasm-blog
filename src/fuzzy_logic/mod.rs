@@ -6,8 +6,8 @@ use macroquad::prelude::*;
 pub fn get_config() -> Conf {
     Conf {
         window_title: "Fuzzy Logic".to_owned(),
-        window_width: 700,
-        window_height: 500,
+        window_width: 512,
+        window_height: 512,
         fullscreen: false,
         ..Default::default()
     }
