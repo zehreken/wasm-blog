@@ -2,6 +2,7 @@
 // The default resolution I set for lab is 700x500
 
 mod audio;
+mod boids;
 mod cycle_drive_train;
 mod fuzzy_logic;
 mod graphics_functions;
