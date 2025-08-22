@@ -1,6 +1,8 @@
 use super::utils::get_random_vector;
 use macroquad::{prelude::*, shapes::draw_circle_lines, text::draw_text};
 
+const VELOCITY: f32 = 30.0;
+
 #[derive(Clone, Copy)]
 pub struct BigCell {
     position: Vec2,
@@ -9,14 +11,16 @@ pub struct BigCell {
     color: Color,
     size: f32,
     pub distance_weight: f32,
+    pub distance_factor: f32,
     pub size_weight: f32,
+    pub size_factor: f32,
 }
 
 impl BigCell {
     pub fn new(size: f32, color: Color) -> Self {
         let position = get_random_vector();
         let target = get_random_vector();
-        let velocity = (target - position).normalize() * 30.0;
+        let velocity = (target - position).normalize() * VELOCITY;
         // println!("{}, {}, {}", position, target, velocity);
         Self {
             position,
@@ -25,7 +29,9 @@ impl BigCell {
             color,
             size,
             distance_weight: 1.0,
+            distance_factor: 0.0,
             size_weight: 1.0,
+            size_factor: 0.0,
         }
     }
 
@@ -55,6 +61,8 @@ impl BigCell {
         for i in 0..10 {
             let prio = self.distance_weight * closeness[i] + self.size_weight * sizes[i];
             if prio > temp {
+                self.distance_factor = closeness[i];
+                self.size_factor = sizes[i];
                 target_id = i;
                 temp = prio;
             }
@@ -62,7 +70,7 @@ impl BigCell {
 
         // println!("target {}", targetId);
         self.target = cells[target_id].get_position();
-        self.velocity = (self.target - self.position).normalize() * 30.0;
+        self.velocity = (self.target - self.position).normalize() * VELOCITY * 0.9;
         self.position += self.velocity * delta_time;
 
         if (self.target - self.position).length_squared() < 1.0 {
@@ -73,6 +81,7 @@ impl BigCell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_circle_lines(x, y, self.size, 5.0, self.color);
+        draw_circle_lines(self.target.x, self.target.y, 10.0, 5.0, RED);
     }
 }
 
@@ -91,8 +100,8 @@ impl Cell {
     pub fn new(id: i8, color: Color) -> Self {
         let position = get_random_vector();
         let target = get_random_vector();
-        let velocity = (target - position).normalize() * 30.0;
-        // println!("{}, {}, {}", position, target, velocisty);
+        let velocity = (target - position).normalize() * VELOCITY;
+        // println!("{}, {}, {}", position, target, velocity);
         Self {
             position,
             velocity,
@@ -109,7 +118,7 @@ impl Cell {
             self.position += self.velocity * delta_time;
             if (self.target - self.position).length_squared() < 1.0 {
                 self.target = get_random_vector();
-                self.velocity = (self.target - self.position).normalize() * 10.0;
+                self.velocity = (self.target - self.position).normalize() * VELOCITY;
             }
         }
     }
@@ -117,9 +126,9 @@ impl Cell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_text(
-            &format!("{}, {}", self.id, self.size),
-            x - 4.0,
-            y + 4.0,
+            &format!("{}|{}", self.id, self.size),
+            x - 12.0,
+            y + self.size + 12.0,
             16.0,
             RED,
         );
