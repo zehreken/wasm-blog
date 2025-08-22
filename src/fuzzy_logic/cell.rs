@@ -11,7 +11,9 @@ pub struct BigCell {
     color: Color,
     size: f32,
     pub distance_weight: f32,
+    pub distance_factor: f32,
     pub size_weight: f32,
+    pub size_factor: f32,
 }
 
 impl BigCell {
@@ -27,7 +29,9 @@ impl BigCell {
             color,
             size,
             distance_weight: 1.0,
+            distance_factor: 0.0,
             size_weight: 1.0,
+            size_factor: 0.0,
         }
     }
 
@@ -57,6 +61,8 @@ impl BigCell {
         for i in 0..10 {
             let prio = self.distance_weight * closeness[i] + self.size_weight * sizes[i];
             if prio > temp {
+                self.distance_factor = closeness[i];
+                self.size_factor = sizes[i];
                 target_id = i;
                 temp = prio;
             }
@@ -64,7 +70,7 @@ impl BigCell {
 
         // println!("target {}", targetId);
         self.target = cells[target_id].get_position();
-        self.velocity = (self.target - self.position).normalize() * 30.0;
+        self.velocity = (self.target - self.position).normalize() * VELOCITY * 0.9;
         self.position += self.velocity * delta_time;
 
         if (self.target - self.position).length_squared() < 1.0 {
@@ -75,6 +81,7 @@ impl BigCell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_circle_lines(x, y, self.size, 5.0, self.color);
+        draw_circle_lines(self.target.x, self.target.y, 10.0, 5.0, RED);
     }
 }
 

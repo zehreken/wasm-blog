@@ -44,5 +44,19 @@ impl Fauna {
             ui.label(None, "size weight");
             ui.slider(hash!(), "", 0.0..1.0, &mut self.big_cell.size_weight);
         });
+
+        draw_text(
+            &format!(
+                "{:.2} {:.2} {:.2} {:.2}",
+                self.big_cell.distance_weight,
+                self.big_cell.distance_factor,
+                self.big_cell.size_weight,
+                self.big_cell.size_factor,
+            ),
+            200.0,
+            12.0,
+            16.0,
+            BLACK,
+        );
     }
 }
