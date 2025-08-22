@@ -1,6 +1,8 @@
 use super::utils::get_random_vector;
 use macroquad::{prelude::*, shapes::draw_circle_lines, text::draw_text};
 
+const VELOCITY: f32 = 30.0;
+
 #[derive(Clone, Copy)]
 pub struct BigCell {
     position: Vec2,
@@ -16,7 +18,7 @@ impl BigCell {
     pub fn new(size: f32, color: Color) -> Self {
         let position = get_random_vector();
         let target = get_random_vector();
-        let velocity = (target - position).normalize() * 30.0;
+        let velocity = (target - position).normalize() * VELOCITY;
         // println!("{}, {}, {}", position, target, velocity);
         Self {
             position,
@@ -91,8 +93,8 @@ impl Cell {
     pub fn new(id: i8, color: Color) -> Self {
         let position = get_random_vector();
         let target = get_random_vector();
-        let velocity = (target - position).normalize() * 30.0;
-        // println!("{}, {}, {}", position, target, velocisty);
+        let velocity = (target - position).normalize() * VELOCITY;
+        // println!("{}, {}, {}", position, target, velocity);
         Self {
             position,
             velocity,
@@ -109,7 +111,7 @@ impl Cell {
             self.position += self.velocity * delta_time;
             if (self.target - self.position).length_squared() < 1.0 {
                 self.target = get_random_vector();
-                self.velocity = (self.target - self.position).normalize() * 10.0;
+                self.velocity = (self.target - self.position).normalize() * VELOCITY;
             }
         }
     }
@@ -117,9 +119,9 @@ impl Cell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_text(
-            &format!("{}, {}", self.id, self.size),
-            x - 4.0,
-            y + 4.0,
+            &format!("{}|{}", self.id, self.size),
+            x - 12.0,
+            y + self.size + 12.0,
             16.0,
             RED,
         );
