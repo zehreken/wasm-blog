@@ -1,6 +1,6 @@
-pub const BOIDS_COUNT: usize = 5;
-pub const COHESION_RANGE: f32 = 100.0;
+pub const BOIDS_COUNT: usize = 10;
+pub const COHESION_RANGE: f32 = 300.0;
 pub const COHESION_RANGE_SQ: f32 = COHESION_RANGE * COHESION_RANGE;
 pub const SEPARATION_RANGE: f32 = 30.0;
 pub const SEPARATION_RANGE_SQ: f32 = SEPARATION_RANGE * SEPARATION_RANGE;
-pub const BOID_SPEED: f32 = 1.1;
+pub const BOID_SPEED: f32 = 50.0;
