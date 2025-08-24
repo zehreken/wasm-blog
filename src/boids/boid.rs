@@ -40,12 +40,19 @@ impl Boid {
             self.direction.y -= 0.1;
         }
 
+        let c = (self.cohesion_target - self.position).normalize();
+        let s = (self.separation_target - self.position).normalize();
+        self.direction += c * 0.1;
+        // self.direction += s * 0.01;
         self.position += self.direction * BOID_SPEED * delta_time;
     }
 
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_circle(x, y, 10.0, RED);
+        let end = self.position + self.direction.normalize() * 10.0;
+
+        draw_line(x, y, end.x, end.y, 2.0, GREEN);
     }
 
     pub fn draw_target(&self) {

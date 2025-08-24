@@ -22,7 +22,7 @@ impl App {
     fn new(width: f32, height: f32) -> Self {
         let mut boids: [Boid; BOIDS_COUNT] = [Boid::new(); BOIDS_COUNT];
         for i in 0..BOIDS_COUNT {
-            boids[i].position = vec2(i as f32 * 10.0 + 100.0, i as f32 * 10.0 + 100.0);
+            boids[i].position = vec2(gen_range(0.0, 500.0), gen_range(0.0, 500.0));
             boids[i].direction = vec2(gen_range(-1.0, 1.0), gen_range(-1.0, 1.0));
         }
         boids[0].position = vec2(300.0, 300.0);
