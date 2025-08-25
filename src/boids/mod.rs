@@ -25,11 +25,6 @@ impl App {
             boids[i].position = vec2(gen_range(0.0, 500.0), gen_range(0.0, 500.0));
             boids[i].direction = vec2(gen_range(-1.0, 1.0), gen_range(-1.0, 1.0));
         }
-        boids[0].position = vec2(300.0, 300.0);
-        boids[1].position = vec2(100.0, 100.0);
-        boids[2].position = vec2(100.0, 200.0);
-        boids[3].position = vec2(200.0, 100.0);
-        boids[4].position = vec2(200.0, 200.0);
 
         Self { boids }
     }
