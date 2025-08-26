@@ -29,21 +29,27 @@ impl Boid {
     pub fn update(&mut self) {
         let delta_time = macroquad::time::get_frame_time();
 
+        let side_factor = 5.0 * delta_time;
+        let target_factor = 5.0 * delta_time;
+        let cohesion_factor = 0.0 * delta_time;
+        let separation_factor = 0.0 * delta_time;
+
         if self.position.x < 10.0 {
-            self.direction.x += 0.1;
+            self.direction.x += side_factor;
         } else if self.position.x > screen_width() - 10.0 {
-            self.direction.x -= 0.1;
+            self.direction.x -= side_factor;
         }
         if self.position.y < 10.0 {
-            self.direction.y += 0.1;
+            self.direction.y += side_factor;
         } else if self.position.y > screen_height() - 10.0 {
-            self.direction.y -= 0.1;
+            self.direction.y -= side_factor;
         }
 
         let c = (self.cohesion_target - self.position).normalize();
         let s = (self.separation_target - self.position).normalize();
         self.direction += c * 0.1;
         // self.direction += s * 0.01;
+
         self.position += self.direction * BOID_SPEED * delta_time;
     }
 
