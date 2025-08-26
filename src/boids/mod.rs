@@ -40,9 +40,9 @@ impl App {
     fn draw(&self) {
         for i in 0..BOIDS_COUNT {
             self.boids[i].draw();
-            if i == 0 {
-                self.boids[i].draw_target();
-            }
+            // if i == 0 {
+            //     self.boids[i].draw_target();
+            // }
         }
     }
 
@@ -77,12 +77,12 @@ fn calculate_targets(boids: &mut [Boid; BOIDS_COUNT]) {
 
     for i in 0..BOIDS_COUNT {
         let cohesion_target = if cohesion_distances[i].1 == 0 {
-            boids[i].position
+            Vec2::ZERO
         } else {
             cohesion_distances[i].0 / cohesion_distances[i].1 as f32
         };
         let separation_target = if separation_distances[i].1 == 0 {
-            boids[i].position
+            Vec2::ZERO
         } else {
             separation_distances[i].0 / separation_distances[i].1 as f32
         };

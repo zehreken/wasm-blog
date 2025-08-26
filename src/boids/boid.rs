@@ -1,5 +1,5 @@
 use macroquad::{
-    color::{BLUE, GREEN, RED},
+    color::{self, BLUE, Color, GREEN, RED},
     input::mouse_position,
     math::{Vec2, vec2},
     shapes::{draw_circle, draw_circle_lines, draw_line},
@@ -34,28 +34,32 @@ impl Boid {
         let cohesion_factor = 0.0 * delta_time;
         let separation_factor = 0.0 * delta_time;
 
-        if self.position.x < 10.0 {
-            self.direction.x += side_factor;
-        } else if self.position.x > screen_width() - 10.0 {
-            self.direction.x -= side_factor;
-        }
-        if self.position.y < 10.0 {
-            self.direction.y += side_factor;
-        } else if self.position.y > screen_height() - 10.0 {
-            self.direction.y -= side_factor;
-        }
+        // if self.position.x < 10.0 {
+        //     self.direction.x += side_factor;
+        // } else if self.position.x > screen_width() - 10.0 {
+        //     self.direction.x -= side_factor;
+        // }
+        // if self.position.y < 10.0 {
+        //     self.direction.y += side_factor;
+        // } else if self.position.y > screen_height() - 10.0 {
+        //     self.direction.y -= side_factor;
+        // }
 
+        let o = (vec2(100.0, 100.0) - self.position).normalize();
+        let a = (vec2(mouse_position().0, mouse_position().1) - self.position).normalize();
         let c = (self.cohesion_target - self.position).normalize();
         let s = (self.separation_target - self.position).normalize();
-        self.direction += c * 0.1;
+        self.direction += a * 10.0 + c * 0.1 - s * 5.0;
+
         // self.direction += s * 0.01;
+        self.direction = self.direction.clamp_length(self.direction.length(), 200.0);
 
         self.position += self.direction * BOID_SPEED * delta_time;
     }
 
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
-        draw_circle(x, y, 10.0, RED);
+        draw_circle(x, y, 6.0, Color::from_rgba(255, 157, 11, 255));
         let end = self.position + self.direction.normalize() * 10.0;
 
         draw_line(x, y, end.x, end.y, 2.0, GREEN);
