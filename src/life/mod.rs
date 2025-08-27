@@ -10,8 +10,6 @@ pub fn get_title() -> String {
 }
 
 pub struct Life {
-    width: f32,
-    height: f32,
     row_count: i32,
     column_count: i32,
     grid: Vec<Vec<Cell>>,
@@ -31,8 +29,6 @@ impl Life {
         }
 
         Self {
-            width,
-            height,
             row_count,
             column_count,
             grid,
@@ -73,8 +69,6 @@ impl App for Life {
     fn draw(&self) {}
 
     fn resize(&mut self, width: f32, height: f32) {
-        self.width = width;
-        self.height = height;
         self.row_count = height as i32 / CELL_SIZE;
         self.column_count = width as i32 / CELL_SIZE;
         let mut grid: Vec<Vec<Cell>> = Vec::new();
@@ -87,29 +81,5 @@ impl App for Life {
         }
 
         self.grid = grid;
-    }
-}
-
-pub async fn run() {
-    let mut app = Life::new(screen_width(), screen_height());
-
-    loop {
-        clear_background(WHITE);
-
-        if (app.width - screen_width()).abs() > 1.0 || (app.height - screen_height()).abs() > 1.0 {
-            app.resize(screen_width(), screen_height());
-        }
-
-        app.update();
-
-        draw_text(
-            &format!("fps: {}", macroquad::time::get_fps()),
-            2.0,
-            12.0,
-            16.0,
-            PINK,
-        );
-
-        next_frame().await
     }
 }

@@ -2,20 +2,22 @@ use macroquad::prelude::*;
 mod config;
 use config::*;
 
-pub fn get_config() -> Conf {
-    Conf {
-        window_title: "Cycle".to_owned(),
-        window_width: WINDOW_WIDTH,
-        window_height: WINDOW_HEIGHT,
-        fullscreen: false,
-        ..Default::default()
+use crate::app::App;
+
+pub fn get_title() -> String {
+    return "Cycle".to_owned();
+}
+
+pub struct Cycle {}
+
+impl Cycle {
+    pub fn new(width: f32, height: f32) -> Self {
+        Self {}
     }
 }
 
-pub async fn run() {
-    loop {
-        clear_background(WHITE);
-
+impl App for Cycle {
+    fn update(&mut self) {
         let rotation = 10.0 * macroquad::time::get_time() as f32;
         let gear_ratio = FRONT_GEAR_SIZE / REAR_GEAR_SIZE;
         draw_wheel(200.0, 256.0, 100.0, rotation / REAR_GEAR_SIZE);
@@ -23,17 +25,11 @@ pub async fn run() {
         draw_circle_with_line(200.0, 256.0, REAR_GEAR_SIZE, rotation / REAR_GEAR_SIZE);
 
         draw_circle_with_line(400.0, 256.0, FRONT_GEAR_SIZE, rotation / FRONT_GEAR_SIZE);
-
-        draw_text(
-            &format!("fps: {}", macroquad::time::get_fps()),
-            2.0,
-            12.0,
-            16.0,
-            PINK,
-        );
-
-        next_frame().await
     }
+
+    fn draw(&self) {}
+
+    fn resize(&mut self, width: f32, height: f32) {}
 }
 
 fn draw_wheel(x: f32, y: f32, radius: f32, rotation: f32) {

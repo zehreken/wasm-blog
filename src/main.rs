@@ -10,11 +10,12 @@ mod fuzzy_logic;
 mod graphics_functions;
 mod life;
 
-use crate::{app::App, life::Life};
+use crate::{app::App, cycle_drive_train::Cycle, life::Life};
 use macroquad::prelude::*;
 
 fn config() -> Conf {
     let window_title = life::get_title();
+    let window_title = cycle_drive_train::get_title();
     // life::get_config()
     // cycle_drive_train::get_config()
     // graphics_functions::get_config()
@@ -33,7 +34,6 @@ fn config() -> Conf {
 
 #[macroquad::main(config)]
 async fn main() {
-    // let future = life::run();
     // let future = cycle_drive_train::run();
     // let future = graphics_functions::run();
     // let future = audio::run();
@@ -41,18 +41,23 @@ async fn main() {
     // let future = boids::run();
 
     let app = Box::new(Life::new(screen_width(), screen_height()));
+    let app = Box::new(Cycle::new(screen_width(), screen_height()));
     let future = run(app);
 
     future.await
 }
 
 async fn run(mut app: Box<dyn App>) {
+    let mut width = screen_width();
+    let mut height = screen_height();
     loop {
         clear_background(WHITE);
 
-        // if (app.width - screen_width()).abs() > 1.0 || (app.height - screen_height()).abs() > 1.0 {
-        //     app.resize(screen_width(), screen_height());
-        // }
+        if (width - screen_width()).abs() > 1.0 || (height - screen_height()).abs() > 1.0 {
+            width = screen_width();
+            height = screen_height();
+            app.resize(width, height);
+        }
 
         app.update();
 
