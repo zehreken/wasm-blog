@@ -7,17 +7,16 @@ mod audio;
 mod boids;
 mod cycle_drive_train;
 mod fuzzy_logic;
-mod graphics_functions;
+mod graphic_functions;
 mod life;
 
-use crate::{app::App, cycle_drive_train::Cycle, life::Life};
+use crate::{app::App, cycle_drive_train::Cycle, graphic_functions::GraphicFunctions, life::Life};
 use macroquad::prelude::*;
 
 fn config() -> Conf {
     let window_title = life::get_title();
     let window_title = cycle_drive_train::get_title();
-    // life::get_config()
-    // cycle_drive_train::get_config()
+    let window_title = graphic_functions::get_title();
     // graphics_functions::get_config()
     // audio::get_config()
     // fuzzy_logic::get_config()
@@ -42,6 +41,7 @@ async fn main() {
 
     let app = Box::new(Life::new(screen_width(), screen_height()));
     let app = Box::new(Cycle::new(screen_width(), screen_height()));
+    let app = Box::new(GraphicFunctions::new());
     let future = run(app);
 
     future.await
