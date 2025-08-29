@@ -1,5 +1,7 @@
 use crate::app::App;
 
+mod cell;
+
 pub fn get_title() -> String {
     return "AStar".to_owned();
 }

@@ -1,25 +1,22 @@
-use crate::boids::{boid::Boid, config::*};
+use crate::{
+    app::App,
+    boids::{boid::Boid, config::*},
+};
 use macroquad::{prelude::*, rand::gen_range};
 
 mod boid;
 mod config;
 
-pub fn get_config() -> Conf {
-    Conf {
-        window_title: "Boids".to_owned(),
-        window_width: 512,
-        window_height: 512,
-        fullscreen: false,
-        ..Default::default()
-    }
+pub fn get_title() -> String {
+    return "Boids".to_owned();
 }
 
-struct App {
+pub struct Boids {
     boids: [Boid; BOIDS_COUNT],
 }
 
-impl App {
-    fn new(width: f32, height: f32) -> Self {
+impl Boids {
+    pub fn new() -> Self {
         let mut boids: [Boid; BOIDS_COUNT] = [Boid::new(); BOIDS_COUNT];
         for i in 0..BOIDS_COUNT {
             boids[i].position = vec2(gen_range(0.0, 500.0), gen_range(0.0, 500.0));
@@ -28,7 +25,9 @@ impl App {
 
         Self { boids }
     }
+}
 
+impl App for Boids {
     fn update(&mut self) {
         calculate_targets(&mut self.boids);
 
@@ -46,7 +45,7 @@ impl App {
         }
     }
 
-    fn resize(width: f32, height: f32) {}
+    fn resize(&mut self, width: f32, height: f32) {}
 }
 
 fn calculate_targets(boids: &mut [Boid; BOIDS_COUNT]) {
@@ -88,27 +87,5 @@ fn calculate_targets(boids: &mut [Boid; BOIDS_COUNT]) {
         };
         boids[i].cohesion_target = cohesion_target;
         boids[i].separation_target = separation_target;
-    }
-}
-
-pub async fn run() {
-    let mut app = App::new(screen_width(), screen_height());
-
-    loop {
-        clear_background(WHITE);
-
-        app.update();
-
-        app.draw();
-
-        draw_text(
-            &format!("fps: {}", macroquad::time::get_fps()),
-            2.0,
-            12.0,
-            16.0,
-            PINK,
-        );
-
-        next_frame().await
     }
 }

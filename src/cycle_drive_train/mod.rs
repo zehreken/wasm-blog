@@ -11,7 +11,7 @@ pub fn get_title() -> String {
 pub struct Cycle {}
 
 impl Cycle {
-    pub fn new(width: f32, height: f32) -> Self {
+    pub fn new() -> Self {
         Self {}
     }
 }

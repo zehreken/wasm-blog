@@ -10,17 +10,19 @@ mod fuzzy_logic;
 mod graphic_functions;
 mod life;
 
-use crate::{app::App, cycle_drive_train::Cycle, graphic_functions::GraphicFunctions, life::Life};
+use crate::{
+    app::App, boids::Boids, cycle_drive_train::Cycle, graphic_functions::GraphicFunctions,
+    life::Life,
+};
 use macroquad::prelude::*;
 
 fn config() -> Conf {
     let window_title = life::get_title();
     let window_title = cycle_drive_train::get_title();
     let window_title = graphic_functions::get_title();
-    // graphics_functions::get_config()
     // audio::get_config()
     // fuzzy_logic::get_config()
-    // boids::get_config()
+    let window_title = boids::get_title();
 
     Conf {
         window_title,
@@ -33,15 +35,12 @@ fn config() -> Conf {
 
 #[macroquad::main(config)]
 async fn main() {
-    // let future = cycle_drive_train::run();
-    // let future = graphics_functions::run();
+    let app = Box::new(Life::new(screen_width(), screen_height()));
+    let app = Box::new(Cycle::new());
+    let app = Box::new(GraphicFunctions::new());
     // let future = audio::run();
     // let future = fuzzy_logic::run();
-    // let future = boids::run();
-
-    let app = Box::new(Life::new(screen_width(), screen_height()));
-    let app = Box::new(Cycle::new(screen_width(), screen_height()));
-    let app = Box::new(GraphicFunctions::new());
+    let app = Box::new(Boids::new());
     let future = run(app);
 
     future.await
