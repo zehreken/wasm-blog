@@ -1,1 +1,1 @@
-pub const CELL_SIZE: i32 = 20;
+pub const CELL_SIZE: f32 = 50.0;

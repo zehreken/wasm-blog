@@ -11,8 +11,8 @@ mod graphic_functions;
 mod life;
 
 use crate::{
-    app::App, boids::Boids, cycle_drive_train::Cycle, graphic_functions::GraphicFunctions,
-    life::Life,
+    a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,
+    graphic_functions::GraphicFunctions, life::Life,
 };
 use macroquad::prelude::*;
 
@@ -23,6 +23,7 @@ fn config() -> Conf {
     // audio::get_config()
     // fuzzy_logic::get_config()
     let window_title = boids::get_title();
+    let window_title = a_star::get_title();
 
     Conf {
         window_title,
@@ -41,6 +42,7 @@ async fn main() {
     // let future = audio::run();
     // let future = fuzzy_logic::run();
     let app = Box::new(Boids::new());
+    let app = Box::new(AStar::new(screen_width(), screen_height()));
     let future = run(app);
 
     future.await

@@ -34,22 +34,11 @@ impl Boid {
         let cohesion_factor = 0.0 * delta_time;
         let separation_factor = 0.0 * delta_time;
 
-        // if self.position.x < 10.0 {
-        //     self.direction.x += side_factor;
-        // } else if self.position.x > screen_width() - 10.0 {
-        //     self.direction.x -= side_factor;
-        // }
-        // if self.position.y < 10.0 {
-        //     self.direction.y += side_factor;
-        // } else if self.position.y > screen_height() - 10.0 {
-        //     self.direction.y -= side_factor;
-        // }
-
-        let o = (vec2(100.0, 100.0) - self.position).normalize();
-        let a = (vec2(mouse_position().0, mouse_position().1) - self.position).normalize();
-        let c = (self.cohesion_target - self.position).normalize();
-        let s = (self.separation_target - self.position).normalize();
-        self.direction += a * 10.0 + c * 0.1 - s * 5.0;
+        let pointer_diff =
+            (vec2(mouse_position().0, mouse_position().1) - self.position).normalize();
+        let cohesion_diff = (self.cohesion_target - self.position).normalize();
+        let separation_diff = (self.separation_target - self.position).normalize();
+        self.direction += pointer_diff * 10.0 + cohesion_diff * 0.1 - separation_diff * 5.0;
 
         // self.direction += s * 0.01;
         self.direction = self.direction.clamp_length(self.direction.length(), 200.0);

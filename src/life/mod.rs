@@ -1,9 +1,10 @@
-use macroquad::prelude::*;
-mod cell;
-mod config;
 use crate::app::App;
 use cell::*;
 use config::*;
+use macroquad::prelude::*;
+
+mod cell;
+mod config;
 
 pub fn get_title() -> String {
     return "Life".to_owned();
