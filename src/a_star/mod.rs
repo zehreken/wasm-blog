@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     a_star::{cell::Cell, config::CELL_SIZE},
     app::App,
@@ -35,14 +37,24 @@ impl AStar {
         }
         Self { grid }
     }
-}
 
-impl App for AStar {
-    fn update(&mut self) {
+    fn find(&mut self) {
+        struct Result {
+            estimated: i32,
+            cost: i32,
+            total: i32,
+        }
+        let mut cell_to_result: HashMap<&Cell, Result> = HashMap::new();
         let mut frontier: Vec<&Cell> = Vec::new();
         frontier.push(&self.grid[0][0]);
 
         while !frontier.is_empty() {}
+    }
+}
+
+impl App for AStar {
+    fn update(&mut self) {
+        self.find();
     }
 
     fn draw(&self) {

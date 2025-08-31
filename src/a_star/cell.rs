@@ -42,8 +42,4 @@ impl Cell {
             BLACK,
         );
     }
-
-    pub fn set_h(&mut self, v: i32) {
-        self.estimated = v;
-    }
 }
