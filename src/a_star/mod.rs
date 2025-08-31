@@ -1,6 +1,7 @@
 use crate::{
     a_star::{cell::Cell, config::CELL_SIZE},
     app::App,
+    shared::Point,
 };
 
 mod cell;
@@ -22,7 +23,14 @@ impl AStar {
         for row in 0..row_count {
             grid.push(Vec::new());
             for column in 0..column_count {
-                grid[row as usize].push(Cell::new(column as f32, row as f32));
+                let cell_type = if row == 0 && column == 0 {
+                    CellType::Start
+                } else if row == 5 && column == 5 {
+                    CellType::End
+                } else {
+                    CellType::Open
+                };
+                grid[row as usize].push(Cell::new(column, row, cell_type, Point::new(5, 5)));
             }
         }
         Self { grid }
@@ -30,7 +38,12 @@ impl AStar {
 }
 
 impl App for AStar {
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        let mut frontier: Vec<&Cell> = Vec::new();
+        frontier.push(&self.grid[0][0]);
+
+        while !frontier.is_empty() {}
+    }
 
     fn draw(&self) {
         for row in 0..self.grid.len() {
@@ -40,5 +53,30 @@ impl App for AStar {
         }
     }
 
-    fn resize(&mut self, width: f32, height: f32) {}
+    fn resize(&mut self, width: f32, height: f32) {
+        let row_count = height as i32 / CELL_SIZE as i32;
+        let column_count = width as i32 / CELL_SIZE as i32;
+        let mut grid: Vec<Vec<Cell>> = Vec::new();
+        for row in 0..row_count {
+            grid.push(Vec::new());
+            for column in 0..column_count {
+                let cell_type = if row == 0 && column == 0 {
+                    CellType::Start
+                } else if row == 5 && column == 5 {
+                    CellType::End
+                } else {
+                    CellType::Open
+                };
+                grid[row as usize].push(Cell::new(column, row, cell_type, Point::new(5, 5)));
+            }
+        }
+        self.grid = grid;
+    }
+}
+
+pub enum CellType {
+    Open,
+    Blocked,
+    Start,
+    End,
 }

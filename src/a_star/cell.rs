@@ -1,26 +1,49 @@
-use macroquad::{color::BLACK, math::Vec2, shapes::draw_rectangle_lines};
-
-use crate::a_star::config::CELL_SIZE;
+use crate::{
+    a_star::{CellType, config::CELL_SIZE},
+    shared::Point,
+};
+use macroquad::prelude::*;
 
 pub struct Cell {
-    position: Vec2,
+    coord: Point,
+    cell_type: CellType,
+    estimated: i32,
 }
 
 impl Cell {
-    pub fn new(x: f32, y: f32) -> Self {
+    pub fn new(x: i32, y: i32, cell_type: CellType, goal_coord: Point) -> Self {
+        let estimated = (x - goal_coord.x).abs() + (y - goal_coord.y).abs();
         Self {
-            position: Vec2::new(x, y),
+            coord: Point::new(x, y),
+            cell_type,
+            estimated, // also called h
         }
     }
 
     pub fn draw(&self) {
-        draw_rectangle_lines(
-            self.position.x,
-            self.position.y,
-            CELL_SIZE,
-            CELL_SIZE,
-            2.0,
+        let color = match self.cell_type {
+            CellType::Open => WHITE,
+            CellType::Blocked => GRAY,
+            CellType::Start => GREEN,
+            CellType::End => RED,
+        };
+        let (x, y) = (
+            self.coord.x as f32 * CELL_SIZE,
+            self.coord.y as f32 * CELL_SIZE,
+        );
+        draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, color);
+        draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 2.0, BLACK);
+        draw_multiline_text(
+            &format!("{},{}\n{}", self.coord.x, self.coord.y, self.estimated),
+            x + 5.0,
+            y + 15.0,
+            16.0,
+            None,
             BLACK,
         );
+    }
+
+    pub fn set_h(&mut self, v: i32) {
+        self.estimated = v;
     }
 }

@@ -1,5 +1,4 @@
 // cargo build --release --target wasm32-unknown-unknown
-// The default resolution I set for lab is 700x500
 
 mod a_star;
 mod app;
@@ -9,6 +8,7 @@ mod cycle_drive_train;
 mod fuzzy_logic;
 mod graphic_functions;
 mod life;
+mod shared;
 
 use crate::{
     a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,

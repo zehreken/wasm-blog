@@ -1,17 +1,6 @@
 use super::config::*;
+use crate::shared::{Point, get_moore_neighbours};
 use std::fmt;
-
-#[derive(Debug, Copy, Clone)]
-pub struct Point {
-    pub x: i32,
-    pub y: i32,
-}
-
-impl fmt::Display for Point {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "x: {}, y: {}", self.x, self.y)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct Cell {
@@ -90,42 +79,4 @@ impl Cell {
     pub fn get_current_state(&self) -> i32 {
         self.current_state
     }
-}
-
-pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
-    if r <= 0 {
-        panic!("wrong argument r");
-    }
-    let mut neighbours: Vec<Point> = Vec::new();
-
-    // Taxicab distance |y1 – y2| + |x1 – x2|
-    let start_x = x - r;
-    let end_x = x + r;
-    let start_y = y - r;
-    let end_y = y + r;
-    for x_n in start_x..=end_x {
-        for y_n in start_y..=end_y {
-            if (y - y_n).abs() + (x - x_n).abs() <= r && !(y == y_n && x == x_n) {
-                neighbours.push(Point { x: x_n, y: y_n });
-            }
-        }
-    }
-
-    neighbours
-}
-
-pub fn get_von_neumann_neighbours(x: i32, y: i32) -> Vec<Point> {
-    get_taxicab_neighbours(x, y, 1)
-}
-
-pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
-    let mut neighbours: Vec<Point> = Vec::new();
-    for i in 0..MOORE_NEIGHBOURHOOD.len() {
-        neighbours.push(Point {
-            x: MOORE_NEIGHBOURHOOD[i].x + x,
-            y: MOORE_NEIGHBOURHOOD[i].y + y,
-        });
-    }
-
-    neighbours
 }
