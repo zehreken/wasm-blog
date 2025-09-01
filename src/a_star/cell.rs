@@ -35,8 +35,8 @@ impl Cell {
         draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 2.0, BLACK);
         draw_multiline_text(
             &format!("{},{}\n{}", self.coord.x, self.coord.y, self.estimated),
-            x + 5.0,
-            y + 15.0,
+            x + 3.0,
+            y + 13.0,
             16.0,
             None,
             BLACK,

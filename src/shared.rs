@@ -1,4 +1,7 @@
-use std::fmt;
+use std::{
+    fmt,
+    hash::{DefaultHasher, Hash, Hasher},
+};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
@@ -65,4 +68,11 @@ pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
     }
 
     neighbours
+}
+
+pub fn get_id(coord: Point) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    coord.x.hash(&mut hasher);
+    coord.y.hash(&mut hasher);
+    hasher.finish()
 }

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     a_star::{cell::Cell, config::CELL_SIZE},
     app::App,
-    shared::Point,
+    shared::{Point, get_id},
 };
 
 mod cell;
@@ -14,6 +14,8 @@ pub fn get_title() -> String {
 }
 
 pub struct AStar {
+    row_count: usize,
+    column_count: usize,
     grid: Vec<Vec<Cell>>,
 }
 
@@ -35,7 +37,11 @@ impl AStar {
                 grid[row as usize].push(Cell::new(column, row, cell_type, Point::new(5, 5)));
             }
         }
-        Self { grid }
+        Self {
+            row_count: row_count as usize,
+            column_count: column_count as usize,
+            grid,
+        }
     }
 
     fn find(&mut self) {
@@ -44,11 +50,23 @@ impl AStar {
             cost: i32,
             total: i32,
         }
-        let mut cell_to_result: HashMap<&Cell, Result> = HashMap::new();
+        let mut cell_to_result: HashMap<u64, Result> = HashMap::new();
+        for row in 0..self.row_count {
+            for column in 0..self.column_count {
+                cell_to_result.insert(
+                    get_id(Point::new(column as i32, row as i32)),
+                    Result {
+                        estimated: 0,
+                        cost: 0,
+                        total: 0,
+                    },
+                );
+            }
+        }
         let mut frontier: Vec<&Cell> = Vec::new();
         frontier.push(&self.grid[0][0]);
 
-        while !frontier.is_empty() {}
+        // while !frontier.is_empty() {}
     }
 }
 
