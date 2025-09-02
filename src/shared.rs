@@ -44,9 +44,6 @@ pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
     for x_n in start_x..=end_x {
         for y_n in start_y..=end_y {
             if (y - y_n).abs() + (x - x_n).abs() <= r && !(y == y_n && x == x_n) {
-                if x_n < 0 || y_n < 0 {
-                    continue;
-                }
                 neighbours.push(Point { x: x_n, y: y_n });
             }
         }

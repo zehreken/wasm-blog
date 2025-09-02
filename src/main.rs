@@ -42,6 +42,8 @@ async fn main() {
     // let future = audio::run();
     // let future = fuzzy_logic::run();
     let app = Box::new(Boids::new());
+    let mut astar = AStar::new(screen_width(), screen_height());
+    astar.resize(screen_width(), screen_height());
     let app = Box::new(AStar::new(screen_width(), screen_height()));
     let future = run(app);
 

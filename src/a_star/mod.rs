@@ -20,7 +20,10 @@ pub struct AStar {
     row_count: usize,
     column_count: usize,
     grid: Vec<Vec<Cell>>,
+    start: Point,
+    end: Point,
     point_to_move_cost: HashMap<Point, MoveCost>,
+    path: HashSet<Point>,
 }
 
 struct MoveCost {
@@ -36,53 +39,39 @@ impl MoveCost {
 
 impl AStar {
     pub fn new(width: f32, height: f32) -> Self {
-        let row_count = height as i32 / CELL_SIZE as i32;
-        let column_count = width as i32 / CELL_SIZE as i32;
-        let mut grid: Vec<Vec<Cell>> = Vec::new();
-        for row in 0..row_count {
-            grid.push(Vec::new());
-            for column in 0..column_count {
-                let cell_type = if row == 0 && column == 0 {
-                    CellType::Start
-                } else if row == 5 && column == 5 {
-                    CellType::End
-                } else {
-                    let rnd = rand() % 5;
-                    if rnd == 0 {
-                        CellType::Blocked
-                    } else {
-                        CellType::Open
-                    }
-                };
-                grid[row as usize].push(Cell::new(column, row, cell_type));
-            }
-        }
-
         Self {
-            row_count: row_count as usize,
-            column_count: column_count as usize,
-            grid,
+            row_count: 0,
+            column_count: 0,
+            grid: Vec::new(),
+            start: Point::new(0, 0),
+            end: Point::new(0, 0),
             point_to_move_cost: HashMap::new(),
+            path: HashSet::new(),
         }
     }
 
     fn find_path(&mut self) {
         self.point_to_move_cost.clear();
+        self.path.clear();
+
         let mut open_set = BinaryHeap::new();
-        let start = self.grid[0][0].coord;
-        open_set.push((Reverse(10), start));
+        let start = self.start;
+        let end = self.end;
+        let start_to_diff = (start.x - end.x).abs() + (start.y - end.y).abs();
+        open_set.push((Reverse(start_to_diff), start));
         self.point_to_move_cost.insert(
             start,
             MoveCost {
-                estimated: 10,
+                estimated: start_to_diff,
                 real: 0,
             },
         );
 
         let mut closed_set = HashSet::new();
+        self.path.insert(start);
 
         while let Some((_total, current)) = open_set.pop() {
-            if current.x == 5 && current.y == 5 {
+            if current.x == end.x && current.y == end.y {
                 break;
             }
 
@@ -96,13 +85,21 @@ impl AStar {
 
             let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
             for neighbour in neighbours {
+                if neighbour.x < 0
+                    || neighbour.y < 0
+                    || neighbour.x >= self.column_count as i32
+                    || neighbour.y >= self.row_count as i32
+                {
+                    continue;
+                }
                 if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
                     == CellType::Blocked
                 {
                     continue;
                 }
 
-                let estimated = (neighbour.x - 5).abs() + (neighbour.y - 5).abs();
+                self.path.insert(current);
+                let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
                     real: current_cost + 1,
@@ -152,6 +149,11 @@ impl App for AStar {
                 }
             }
         }
+        for point in &self.path {
+            let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+            let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+            draw_circle(x, y, 5.0, BLUE);
+        }
     }
 
     fn resize(&mut self, width: f32, height: f32) {
@@ -179,6 +181,8 @@ impl App for AStar {
         self.row_count = row_count as usize;
         self.column_count = column_count as usize;
         self.grid = grid;
+        self.start = Point::new(0, 0);
+        self.end = Point::new(column_count - 1, row_count - 1);
     }
 }
 
