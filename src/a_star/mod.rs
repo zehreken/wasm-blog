@@ -34,7 +34,7 @@ impl AStar {
                 } else {
                     CellType::Open
                 };
-                grid[row as usize].push(Cell::new(column, row, cell_type, Point::new(5, 5)));
+                grid[row as usize].push(Cell::new(column, row, cell_type));
             }
         }
         Self {
@@ -50,13 +50,14 @@ impl AStar {
             cost: i32,
             total: i32,
         }
-        let mut cell_to_result: HashMap<u64, Result> = HashMap::new();
+        let mut id_to_result: HashMap<u64, Result> = HashMap::new();
         for row in 0..self.row_count {
             for column in 0..self.column_count {
-                cell_to_result.insert(
-                    get_id(Point::new(column as i32, row as i32)),
+                let point = Point::new(column as i32, row as i32);
+                id_to_result.insert(
+                    get_id(point),
                     Result {
-                        estimated: 0,
+                        estimated: (point.x - 5).abs() + (point.y - 5).abs(),
                         cost: 0,
                         total: 0,
                     },
@@ -66,7 +67,15 @@ impl AStar {
         let mut frontier: Vec<&Cell> = Vec::new();
         frontier.push(&self.grid[0][0]);
 
-        // while !frontier.is_empty() {}
+        // while !frontier.is_empty() {
+        for row in 0..self.row_count {
+            for column in 0..self.column_count {
+                let point = Point::new(column as i32, row as i32);
+                let r = &id_to_result[&get_id(point)];
+                self.grid[row][column].set(r.estimated, r.cost, r.total);
+            }
+        }
+        // }
     }
 }
 
@@ -76,8 +85,8 @@ impl App for AStar {
     }
 
     fn draw(&self) {
-        for row in 0..self.grid.len() {
-            for column in 0..self.grid[0].len() {
+        for row in 0..self.row_count {
+            for column in 0..self.column_count {
                 self.grid[row][column].draw();
             }
         }
@@ -97,7 +106,7 @@ impl App for AStar {
                 } else {
                     CellType::Open
                 };
-                grid[row as usize].push(Cell::new(column, row, cell_type, Point::new(5, 5)));
+                grid[row as usize].push(Cell::new(column, row, cell_type));
             }
         }
         self.grid = grid;
