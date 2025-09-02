@@ -1,9 +1,6 @@
-use std::{
-    fmt,
-    hash::{DefaultHasher, Hash, Hasher},
-};
+use std::fmt;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -32,6 +29,7 @@ pub const MOORE_NEIGHBOURHOOD: [Point; 8] = [
     Point { x: 0, y: -1 },
 ];
 
+// Also known as Manhattan distance
 pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
     if r <= 0 {
         panic!("wrong argument r");
@@ -46,6 +44,9 @@ pub fn get_taxicab_neighbours(x: i32, y: i32, r: i32) -> Vec<Point> {
     for x_n in start_x..=end_x {
         for y_n in start_y..=end_y {
             if (y - y_n).abs() + (x - x_n).abs() <= r && !(y == y_n && x == x_n) {
+                if x_n < 0 || y_n < 0 {
+                    continue;
+                }
                 neighbours.push(Point { x: x_n, y: y_n });
             }
         }
@@ -68,11 +69,4 @@ pub fn get_moore_neighbours(x: i32, y: i32) -> Vec<Point> {
     }
 
     neighbours
-}
-
-pub fn get_id(coord: Point) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    coord.x.hash(&mut hasher);
-    coord.y.hash(&mut hasher);
-    hasher.finish()
 }

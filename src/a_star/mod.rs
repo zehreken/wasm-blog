@@ -1,9 +1,12 @@
-use std::collections::HashMap;
-
 use crate::{
     a_star::{cell::Cell, config::CELL_SIZE},
     app::App,
-    shared::{Point, get_id},
+    shared::{Point, get_taxicab_neighbours},
+};
+use macroquad::{input, prelude::*, rand::rand};
+use std::{
+    cmp::Reverse,
+    collections::{BinaryHeap, HashMap, HashSet},
 };
 
 mod cell;
@@ -17,6 +20,18 @@ pub struct AStar {
     row_count: usize,
     column_count: usize,
     grid: Vec<Vec<Cell>>,
+    point_to_move_cost: HashMap<Point, MoveCost>,
+}
+
+struct MoveCost {
+    pub estimated: i32,
+    pub real: i32,
+}
+
+impl MoveCost {
+    pub fn total(&self) -> i32 {
+        self.real + self.estimated
+    }
 }
 
 impl AStar {
@@ -32,62 +47,109 @@ impl AStar {
                 } else if row == 5 && column == 5 {
                     CellType::End
                 } else {
-                    CellType::Open
+                    let rnd = rand() % 5;
+                    if rnd == 0 {
+                        CellType::Blocked
+                    } else {
+                        CellType::Open
+                    }
                 };
                 grid[row as usize].push(Cell::new(column, row, cell_type));
             }
         }
+
         Self {
             row_count: row_count as usize,
             column_count: column_count as usize,
             grid,
+            point_to_move_cost: HashMap::new(),
         }
     }
 
-    fn find(&mut self) {
-        struct Result {
-            estimated: i32,
-            cost: i32,
-            total: i32,
-        }
-        let mut id_to_result: HashMap<u64, Result> = HashMap::new();
-        for row in 0..self.row_count {
-            for column in 0..self.column_count {
-                let point = Point::new(column as i32, row as i32);
-                id_to_result.insert(
-                    get_id(point),
-                    Result {
-                        estimated: (point.x - 5).abs() + (point.y - 5).abs(),
-                        cost: 0,
-                        total: 0,
-                    },
-                );
-            }
-        }
-        let mut frontier: Vec<&Cell> = Vec::new();
-        frontier.push(&self.grid[0][0]);
+    fn find_path(&mut self) {
+        self.point_to_move_cost.clear();
+        let mut open_set = BinaryHeap::new();
+        let start = self.grid[0][0].coord;
+        open_set.push((Reverse(10), start));
+        self.point_to_move_cost.insert(
+            start,
+            MoveCost {
+                estimated: 10,
+                real: 0,
+            },
+        );
 
-        // while !frontier.is_empty() {
-        for row in 0..self.row_count {
-            for column in 0..self.column_count {
-                let point = Point::new(column as i32, row as i32);
-                let r = &id_to_result[&get_id(point)];
-                self.grid[row][column].set(r.estimated, r.cost, r.total);
+        let mut closed_set = HashSet::new();
+
+        while let Some((_total, current)) = open_set.pop() {
+            if current.x == 5 && current.y == 5 {
+                break;
+            }
+
+            if closed_set.contains(&current) {
+                continue;
+            }
+
+            closed_set.insert(current);
+
+            let current_cost = self.point_to_move_cost[&current].real;
+
+            let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
+            for neighbour in neighbours {
+                if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
+                    == CellType::Blocked
+                {
+                    continue;
+                }
+
+                let estimated = (neighbour.x - 5).abs() + (neighbour.y - 5).abs();
+                let move_cost = MoveCost {
+                    estimated,
+                    real: current_cost + 1,
+                };
+                if !self.point_to_move_cost.contains_key(&neighbour) {
+                    open_set.push((Reverse(move_cost.total()), neighbour));
+                    self.point_to_move_cost.insert(neighbour, move_cost);
+                }
             }
         }
-        // }
     }
 }
 
 impl App for AStar {
     fn update(&mut self) {
-        self.find();
+        if input::is_key_pressed(KeyCode::F) {
+            self.find_path();
+        }
     }
 
     fn draw(&self) {
         for row in 0..self.row_count {
             for column in 0..self.column_count {
                 self.grid[row][column].draw();
+
+                let x = column as f32 * CELL_SIZE;
+                let y = row as f32 * CELL_SIZE;
+
+                let point = Point::new(column as i32, row as i32);
+                if self.point_to_move_cost.contains_key(&point) {
+                    let move_cost = &self.point_to_move_cost[&point];
+                    draw_multiline_text(
+                        &format!(
+                            "{},{}\n{}|{}|{}",
+                            column,
+                            row,
+                            move_cost.estimated,
+                            move_cost.real,
+                            move_cost.total()
+                        ),
+                        x + 3.0,
+                        y + 13.0,
+                        14.0,
+                        None,
+                        BLACK,
+                    );
+                }
             }
         }
     }
@@ -101,18 +163,26 @@ impl App for AStar {
             for column in 0..column_count {
                 let cell_type = if row == 0 && column == 0 {
                     CellType::Start
-                } else if row == 5 && column == 5 {
+                } else if row == row_count - 1 && column == column_count - 1 {
                     CellType::End
                 } else {
-                    CellType::Open
+                    let rnd = rand() % 5;
+                    if rnd == 0 {
+                        CellType::Blocked
+                    } else {
+                        CellType::Open
+                    }
                 };
                 grid[row as usize].push(Cell::new(column, row, cell_type));
             }
         }
+        self.row_count = row_count as usize;
+        self.column_count = column_count as usize;
         self.grid = grid;
     }
 }
 
+#[derive(PartialEq)]
 pub enum CellType {
     Open,
     Blocked,
