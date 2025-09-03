@@ -160,12 +160,14 @@ impl App for AStar {
         let row_count = height as i32 / CELL_SIZE as i32;
         let column_count = width as i32 / CELL_SIZE as i32;
         let mut grid: Vec<Vec<Cell>> = Vec::new();
+        let start = Point::new(0, 0);
+        let end = Point::new(column_count - 1, 0);
         for row in 0..row_count {
             grid.push(Vec::new());
             for column in 0..column_count {
-                let cell_type = if row == 0 && column == 0 {
+                let cell_type = if row == start.y && column == start.x {
                     CellType::Start
-                } else if row == row_count - 1 && column == column_count - 1 {
+                } else if row == end.y && column == end.x {
                     CellType::End
                 } else {
                     let rnd = rand() % 5;
@@ -181,8 +183,8 @@ impl App for AStar {
         self.row_count = row_count as usize;
         self.column_count = column_count as usize;
         self.grid = grid;
-        self.start = Point::new(0, 0);
-        self.end = Point::new(column_count - 1, row_count - 1);
+        self.start = start;
+        self.end = end;
     }
 }
 

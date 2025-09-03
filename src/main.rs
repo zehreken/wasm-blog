@@ -44,7 +44,7 @@ async fn main() {
     let app = Box::new(Boids::new());
     let mut astar = AStar::new(screen_width(), screen_height());
     astar.resize(screen_width(), screen_height());
-    let app = Box::new(AStar::new(screen_width(), screen_height()));
+    let app = Box::new(astar);
     let future = run(app);
 
     future.await
