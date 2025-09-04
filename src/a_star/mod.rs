@@ -26,6 +26,7 @@ pub struct AStar {
     path: HashSet<Point>,
 }
 
+#[derive(Clone, Copy)]
 struct MoveCost {
     pub estimated: i32,
     pub real: i32,
@@ -38,7 +39,7 @@ impl MoveCost {
 }
 
 impl AStar {
-    pub fn new(width: f32, height: f32) -> Self {
+    pub fn new() -> Self {
         Self {
             row_count: 0,
             column_count: 0,
@@ -81,7 +82,7 @@ impl AStar {
 
             closed_set.insert(current);
 
-            let current_cost = self.point_to_move_cost[&current].real;
+            let current_cost = self.point_to_move_cost[&current];
 
             let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
             for neighbour in neighbours {
@@ -102,7 +103,7 @@ impl AStar {
                 let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
-                    real: current_cost + 1,
+                    real: current_cost.real + 1,
                 };
                 if !self.point_to_move_cost.contains_key(&neighbour) {
                     open_set.push((Reverse(move_cost.total()), neighbour));
