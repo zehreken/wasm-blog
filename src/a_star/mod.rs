@@ -22,8 +22,14 @@ pub struct AStar {
     grid: Vec<Vec<Cell>>,
     start: Point,
     end: Point,
+    simulation_state: SimulationState,
+}
+
+struct SimulationState {
     point_to_move_cost: HashMap<Point, MoveCost>,
     path: HashSet<Point>,
+    open_set: BinaryHeap<(Reverse<i32>, Point)>,
+    closed_set: HashSet<Point>,
 }
 
 #[derive(Clone, Copy)]
@@ -40,27 +46,35 @@ impl MoveCost {
 
 impl AStar {
     pub fn new() -> Self {
+        let simulation_state = SimulationState {
+            point_to_move_cost: HashMap::new(),
+            path: HashSet::new(),
+            open_set: BinaryHeap::new(),
+            closed_set: HashSet::new(),
+        };
         Self {
             row_count: 0,
             column_count: 0,
             grid: Vec::new(),
             start: Point::new(0, 0),
             end: Point::new(0, 0),
-            point_to_move_cost: HashMap::new(),
-            path: HashSet::new(),
+            simulation_state,
         }
     }
 
     fn find_path(&mut self) {
-        self.point_to_move_cost.clear();
-        self.path.clear();
+        self.simulation_state.point_to_move_cost.clear();
+        self.simulation_state.path.clear();
+        self.simulation_state.open_set.clear();
+        self.simulation_state.closed_set.clear();
 
-        let mut open_set = BinaryHeap::new();
         let start = self.start;
         let end = self.end;
         let start_to_diff = (start.x - end.x).abs() + (start.y - end.y).abs();
-        open_set.push((Reverse(start_to_diff), start));
-        self.point_to_move_cost.insert(
+        self.simulation_state
+            .open_set
+            .push((Reverse(start_to_diff), start));
+        self.simulation_state.point_to_move_cost.insert(
             start,
             MoveCost {
                 estimated: start_to_diff,
@@ -68,21 +82,22 @@ impl AStar {
             },
         );
 
-        let mut closed_set = HashSet::new();
-        self.path.insert(start);
+        return;
 
-        while let Some((_total, current)) = open_set.pop() {
+        self.simulation_state.path.insert(start);
+
+        while let Some((_total, current)) = self.simulation_state.open_set.pop() {
             if current.x == end.x && current.y == end.y {
                 break;
             }
 
-            if closed_set.contains(&current) {
+            if self.simulation_state.closed_set.contains(&current) {
                 continue;
             }
 
-            closed_set.insert(current);
+            self.simulation_state.closed_set.insert(current);
 
-            let current_cost = self.point_to_move_cost[&current];
+            let current_cost = self.simulation_state.point_to_move_cost[&current];
 
             let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
             for neighbour in neighbours {
@@ -99,15 +114,74 @@ impl AStar {
                     continue;
                 }
 
-                self.path.insert(current);
+                self.simulation_state.path.insert(current);
                 let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
                     real: current_cost.real + 1,
                 };
-                if !self.point_to_move_cost.contains_key(&neighbour) {
-                    open_set.push((Reverse(move_cost.total()), neighbour));
-                    self.point_to_move_cost.insert(neighbour, move_cost);
+                if !self
+                    .simulation_state
+                    .point_to_move_cost
+                    .contains_key(&neighbour)
+                {
+                    self.simulation_state
+                        .open_set
+                        .push((Reverse(move_cost.total()), neighbour));
+                    self.simulation_state
+                        .point_to_move_cost
+                        .insert(neighbour, move_cost);
+                }
+            }
+        }
+    }
+
+    fn step(&mut self) {
+        if let Some((_total, current)) = self.simulation_state.open_set.pop() {
+            if current.x == self.end.x && current.y == self.end.y {
+                return;
+            }
+
+            if self.simulation_state.closed_set.contains(&current) {
+                return;
+            }
+
+            self.simulation_state.closed_set.insert(current);
+
+            let current_cost = self.simulation_state.point_to_move_cost[&current];
+
+            let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
+            for neighbour in neighbours {
+                if neighbour.x < 0
+                    || neighbour.y < 0
+                    || neighbour.x >= self.column_count as i32
+                    || neighbour.y >= self.row_count as i32
+                {
+                    continue;
+                }
+                if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
+                    == CellType::Blocked
+                {
+                    continue;
+                }
+
+                self.simulation_state.path.insert(current);
+                let estimated = (neighbour.x - self.end.x).abs() + (neighbour.y - self.end.y).abs();
+                let move_cost = MoveCost {
+                    estimated,
+                    real: current_cost.real + 1,
+                };
+                if !self
+                    .simulation_state
+                    .point_to_move_cost
+                    .contains_key(&neighbour)
+                {
+                    self.simulation_state
+                        .open_set
+                        .push((Reverse(move_cost.total()), neighbour));
+                    self.simulation_state
+                        .point_to_move_cost
+                        .insert(neighbour, move_cost);
                 }
             }
         }
@@ -118,6 +192,9 @@ impl App for AStar {
     fn update(&mut self) {
         if input::is_key_pressed(KeyCode::F) {
             self.find_path();
+        }
+        if input::is_key_pressed(KeyCode::S) {
+            self.step();
         }
     }
 
@@ -130,8 +207,12 @@ impl App for AStar {
                 let y = row as f32 * CELL_SIZE;
 
                 let point = Point::new(column as i32, row as i32);
-                if self.point_to_move_cost.contains_key(&point) {
-                    let move_cost = &self.point_to_move_cost[&point];
+                if self
+                    .simulation_state
+                    .point_to_move_cost
+                    .contains_key(&point)
+                {
+                    let move_cost = &self.simulation_state.point_to_move_cost[&point];
                     draw_multiline_text(
                         &format!(
                             "{},{}\n{}|{}|{}",
@@ -150,11 +231,16 @@ impl App for AStar {
                 }
             }
         }
-        for point in &self.path {
+        for point in &self.simulation_state.closed_set {
             let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
             let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            draw_circle(x, y, 5.0, BLUE);
+            draw_text("C", x, y, 50.0, RED);
         }
+        // for point in &self.path {
+        //     let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+        //     let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+        //     draw_circle(x, y, 5.0, BLUE);
+        // }
     }
 
     fn resize(&mut self, width: f32, height: f32) {
@@ -162,7 +248,7 @@ impl App for AStar {
         let column_count = width as i32 / CELL_SIZE as i32;
         let mut grid: Vec<Vec<Cell>> = Vec::new();
         let start = Point::new(0, 0);
-        let end = Point::new(column_count - 1, 0);
+        let end = Point::new(0, row_count - 1);
         for row in 0..row_count {
             grid.push(Vec::new());
             for column in 0..column_count {
