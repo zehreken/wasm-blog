@@ -27,9 +27,11 @@ pub struct AStar {
 
 struct SimulationState {
     point_to_move_cost: HashMap<Point, MoveCost>,
-    path: HashSet<Point>,
+    // path: HashSet<Point>,
     open_set: BinaryHeap<(Reverse<i32>, Point)>,
     closed_set: HashSet<Point>,
+    point_to_came_from: Vec<(Point, Point)>,
+    path: HashSet<Point>,
 }
 
 #[derive(Clone, Copy)]
@@ -48,9 +50,11 @@ impl AStar {
     pub fn new() -> Self {
         let simulation_state = SimulationState {
             point_to_move_cost: HashMap::new(),
-            path: HashSet::new(),
+            // path: HashSet::new(),
             open_set: BinaryHeap::new(),
             closed_set: HashSet::new(),
+            point_to_came_from: Vec::new(),
+            path: HashSet::new(),
         };
         Self {
             row_count: 0,
@@ -64,9 +68,10 @@ impl AStar {
 
     fn find_path(&mut self) {
         self.simulation_state.point_to_move_cost.clear();
-        self.simulation_state.path.clear();
+        // self.simulation_state.path.clear();
         self.simulation_state.open_set.clear();
         self.simulation_state.closed_set.clear();
+        self.simulation_state.point_to_came_from.clear();
 
         let start = self.start;
         let end = self.end;
@@ -84,7 +89,7 @@ impl AStar {
 
         return;
 
-        self.simulation_state.path.insert(start);
+        // self.simulation_state.path.insert(start);
 
         while let Some((_total, current)) = self.simulation_state.open_set.pop() {
             if current.x == end.x && current.y == end.y {
@@ -114,7 +119,7 @@ impl AStar {
                     continue;
                 }
 
-                self.simulation_state.path.insert(current);
+                // self.simulation_state.path.insert(current);
                 let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
@@ -165,7 +170,10 @@ impl AStar {
                     continue;
                 }
 
-                self.simulation_state.path.insert(current);
+                // self.simulation_state.path.insert(current);
+                self.simulation_state
+                    .point_to_came_from
+                    .push((neighbour, current));
                 let estimated = (neighbour.x - self.end.x).abs() + (neighbour.y - self.end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
@@ -182,6 +190,17 @@ impl AStar {
                     self.simulation_state
                         .point_to_move_cost
                         .insert(neighbour, move_cost);
+                }
+            }
+        }
+
+        self.simulation_state.path.clear();
+        if let Some((child, parent)) = self.simulation_state.point_to_came_from.last() {
+            let mut current_end = *child;
+            for (new_child, new_parent) in self.simulation_state.point_to_came_from.iter().rev() {
+                if current_end == *new_child {
+                    self.simulation_state.path.insert(*new_child);
+                    current_end = *new_parent;
                 }
             }
         }
@@ -236,19 +255,19 @@ impl App for AStar {
             let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
             draw_text("C", x, y, 50.0, RED);
         }
-        // for point in &self.path {
-        //     let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-        //     let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-        //     draw_circle(x, y, 5.0, BLUE);
-        // }
+        for point in &self.simulation_state.path {
+            let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+            let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+            draw_circle_lines(x, y, 10.0, 3.0, BLUE);
+        }
     }
 
     fn resize(&mut self, width: f32, height: f32) {
         let row_count = height as i32 / CELL_SIZE as i32;
         let column_count = width as i32 / CELL_SIZE as i32;
         let mut grid: Vec<Vec<Cell>> = Vec::new();
-        let start = Point::new(0, 0);
-        let end = Point::new(0, row_count - 1);
+        let start = Point::new(column_count - 1, row_count - 1);
+        let end = Point::new(0, 0);
         for row in 0..row_count {
             grid.push(Vec::new());
             for column in 0..column_count {
@@ -257,7 +276,7 @@ impl App for AStar {
                 } else if row == end.y && column == end.x {
                     CellType::End
                 } else {
-                    let rnd = rand() % 5;
+                    let rnd = rand() % 3;
                     if rnd == 0 {
                         CellType::Blocked
                     } else {
