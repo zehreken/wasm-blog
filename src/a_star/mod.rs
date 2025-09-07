@@ -205,7 +205,6 @@ impl AStar {
             }
         }
 
-        let mut i = 0;
         // Found shortest path
         if let Some(_) = self.simulation_state.point_to_move_cost.get(&self.end) {
             self.simulation_state.path.clear();
@@ -224,10 +223,6 @@ impl AStar {
                     }
                 }
                 self.simulation_state.path.insert(current_parent);
-                i += 1;
-                if i > 100 {
-                    break;
-                }
             }
         }
     }
@@ -276,11 +271,11 @@ impl App for AStar {
                 }
             }
         }
-        for point in &self.simulation_state.closed_set {
-            let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            draw_text("C", x, y, 50.0, RED);
-        }
+        // for point in &self.simulation_state.closed_set {
+        //     let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+        //     let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
+        //     draw_text("C", x, y, 50.0, RED);
+        // }
         for point in &self.simulation_state.path {
             let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
             let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
