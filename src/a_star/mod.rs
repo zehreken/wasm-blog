@@ -204,6 +204,32 @@ impl AStar {
                 }
             }
         }
+
+        let mut i = 0;
+        // Found shortest path
+        if let Some(_) = self.simulation_state.point_to_move_cost.get(&self.end) {
+            self.simulation_state.path.clear();
+            let mut current_parent = self.end;
+            self.simulation_state.path.insert(self.end);
+            while current_parent != self.start {
+                let neighbours = get_taxicab_neighbours(current_parent.x, current_parent.y, 1);
+                let mut distance = i32::MAX;
+                for neighbour in neighbours {
+                    if let Some(move_cost) =
+                        self.simulation_state.point_to_move_cost.get(&neighbour)
+                        && move_cost.real < distance
+                    {
+                        distance = move_cost.real;
+                        current_parent = neighbour;
+                    }
+                }
+                self.simulation_state.path.insert(current_parent);
+                i += 1;
+                if i > 100 {
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -276,7 +302,7 @@ impl App for AStar {
                 } else if row == end.y && column == end.x {
                     CellType::End
                 } else {
-                    let rnd = rand() % 3;
+                    let rnd = rand() % 4;
                     if rnd == 0 {
                         CellType::Blocked
                     } else {
