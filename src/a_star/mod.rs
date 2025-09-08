@@ -1,5 +1,5 @@
 use crate::{
-    a_star::{cell::Cell, config::CELL_SIZE},
+    a_star::config::CELL_SIZE,
     app::App,
     shared::{Point, get_taxicab_neighbours},
 };
@@ -9,7 +9,6 @@ use std::{
     collections::{BinaryHeap, HashMap, HashSet},
 };
 
-mod cell;
 mod config;
 
 pub fn get_title() -> String {
@@ -19,9 +18,11 @@ pub fn get_title() -> String {
 pub struct AStar {
     row_count: usize,
     column_count: usize,
-    grid: Vec<Vec<Cell>>,
+    grid: Vec<Vec<CellType>>,
     start: Point,
     end: Point,
+    is_dragging_start: bool,
+    is_dragging_end: bool,
     simulation_state: SimulationState,
 }
 
@@ -62,6 +63,8 @@ impl AStar {
             grid: Vec::new(),
             start: Point::new(0, 0),
             end: Point::new(0, 0),
+            is_dragging_start: false,
+            is_dragging_end: false,
             simulation_state,
         }
     }
@@ -92,54 +95,54 @@ impl AStar {
 
         // self.simulation_state.path.insert(start);
 
-        while let Some((_total, current)) = self.simulation_state.open_set.pop() {
-            if current.x == end.x && current.y == end.y {
-                break;
-            }
+        // while let Some((_total, current)) = self.simulation_state.open_set.pop() {
+        //     if current.x == end.x && current.y == end.y {
+        //         break;
+        //     }
 
-            if self.simulation_state.closed_set.contains(&current) {
-                continue;
-            }
+        //     if self.simulation_state.closed_set.contains(&current) {
+        //         continue;
+        //     }
 
-            self.simulation_state.closed_set.insert(current);
+        //     self.simulation_state.closed_set.insert(current);
 
-            let current_cost = self.simulation_state.point_to_move_cost[&current];
+        //     let current_cost = self.simulation_state.point_to_move_cost[&current];
 
-            let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
-            for neighbour in neighbours {
-                if neighbour.x < 0
-                    || neighbour.y < 0
-                    || neighbour.x >= self.column_count as i32
-                    || neighbour.y >= self.row_count as i32
-                {
-                    continue;
-                }
-                if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
-                    == CellType::Blocked
-                {
-                    continue;
-                }
+        //     let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
+        //     for neighbour in neighbours {
+        //         if neighbour.x < 0
+        //             || neighbour.y < 0
+        //             || neighbour.x >= self.column_count as i32
+        //             || neighbour.y >= self.row_count as i32
+        //         {
+        //             continue;
+        //         }
+        //         if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
+        //             == CellType::Blocked
+        //         {
+        //             continue;
+        //         }
 
-                // self.simulation_state.path.insert(current);
-                let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
-                let move_cost = MoveCost {
-                    estimated,
-                    real: current_cost.real + 1,
-                };
-                if !self
-                    .simulation_state
-                    .point_to_move_cost
-                    .contains_key(&neighbour)
-                {
-                    self.simulation_state
-                        .open_set
-                        .push((Reverse(move_cost.total()), neighbour));
-                    self.simulation_state
-                        .point_to_move_cost
-                        .insert(neighbour, move_cost);
-                }
-            }
-        }
+        //         // self.simulation_state.path.insert(current);
+        //         let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
+        //         let move_cost = MoveCost {
+        //             estimated,
+        //             real: current_cost.real + 1,
+        //         };
+        //         if !self
+        //             .simulation_state
+        //             .point_to_move_cost
+        //             .contains_key(&neighbour)
+        //         {
+        //             self.simulation_state
+        //                 .open_set
+        //                 .push((Reverse(move_cost.total()), neighbour));
+        //             self.simulation_state
+        //                 .point_to_move_cost
+        //                 .insert(neighbour, move_cost);
+        //         }
+        //     }
+        // }
     }
 
     fn step(&mut self) {
@@ -165,9 +168,7 @@ impl AStar {
                 {
                     continue;
                 }
-                if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
-                    == CellType::Blocked
-                {
+                if self.grid[neighbour.y as usize][neighbour.x as usize] == CellType::Blocked {
                     continue;
                 }
 
@@ -266,41 +267,89 @@ impl App for AStar {
             let pos = input::mouse_position();
             let column = pos.0 as usize / CELL_SIZE as usize;
             let row = pos.1 as usize / CELL_SIZE as usize;
-            self.grid[row][column].toggle_blocked();
+            if (0..self.grid.len()).contains(&row) && (0..self.grid[0].len()).contains(&column) {
+                if self.grid[row][column] == CellType::Blocked {
+                    self.grid[row][column] = CellType::Open;
+                } else if self.grid[row][column] == CellType::Open {
+                    self.grid[row][column] = CellType::Blocked;
+                }
+            }
+        }
+        if input::is_mouse_button_pressed(MouseButton::Left) {
+            let pos = input::mouse_position();
+            let column = pos.0 as usize / CELL_SIZE as usize;
+            let row = pos.1 as usize / CELL_SIZE as usize;
+            let point = Point::new(column as i32, row as i32);
+            if (0..self.grid.len()).contains(&row) && (0..self.grid[0].len()).contains(&column) {
+                if point == self.start {
+                    self.is_dragging_start = true;
+                } else if point == self.end {
+                    self.is_dragging_end = true;
+                }
+            }
+        }
+        if input::is_mouse_button_released(MouseButton::Left) {
+            let pos = input::mouse_position();
+            let column = pos.0 as usize / CELL_SIZE as usize;
+            let row = pos.1 as usize / CELL_SIZE as usize;
+            let point = Point::new(column as i32, row as i32);
+            if self.is_dragging_start {
+                self.is_dragging_start = false;
+                self.start = point;
+            } else if self.is_dragging_end {
+                self.is_dragging_end = false;
+                self.end = point;
+            }
         }
     }
 
     fn draw(&self) {
         for row in 0..self.row_count {
             for column in 0..self.column_count {
-                self.grid[row][column].draw();
-
                 let x = column as f32 * CELL_SIZE;
                 let y = row as f32 * CELL_SIZE;
-
                 let point = Point::new(column as i32, row as i32);
+                if point == self.start {
+                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, GREEN);
+                } else if point == self.end {
+                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, RED);
+                }
+                if self.grid[row][column] == CellType::Blocked {
+                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, GRAY);
+                }
+
                 if self
                     .simulation_state
                     .point_to_move_cost
                     .contains_key(&point)
                 {
                     let move_cost = &self.simulation_state.point_to_move_cost[&point];
-                    draw_multiline_text(
-                        &format!(
-                            "{},{}\n{}|{}|{}",
-                            column,
-                            row,
-                            move_cost.estimated,
-                            move_cost.real,
-                            move_cost.total()
-                        ),
+                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, ORANGE);
+                    draw_text(
+                        &format!("{}", move_cost.real),
                         x + 3.0,
                         y + 13.0,
                         14.0,
-                        None,
                         BLACK,
                     );
+                    // draw_multiline_text(
+                    //     &format!(
+                    //         "{},{}\n{}|{}|{}",
+                    //         column,
+                    //         row,
+                    //         move_cost.estimated,
+                    //         move_cost.real,
+                    //         move_cost.total()
+                    //     ),
+                    //     x + 3.0,
+                    //     y + 13.0,
+                    //     14.0,
+                    //     None,
+                    //     BLACK,
+                    // );
                 }
+
+                draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 2.0, BLACK);
             }
         }
         // for point in &self.simulation_state.closed_set {
@@ -309,16 +358,24 @@ impl App for AStar {
         //     draw_text("C", x, y, 50.0, RED);
         // }
         for point in &self.simulation_state.path {
-            let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            draw_circle(x, y, 10.0, BLUE);
+            let x = point.x as f32 * CELL_SIZE;
+            let y = point.y as f32 * CELL_SIZE;
+            draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, BLUE);
+        }
+
+        if self.is_dragging_start {
+            let (x, y) = input::mouse_position();
+            draw_circle(x, y, 10.0, GREEN);
+        } else if self.is_dragging_end {
+            let (x, y) = input::mouse_position();
+            draw_circle(x, y, 10.0, RED);
         }
     }
 
     fn resize(&mut self, width: f32, height: f32) {
         let row_count = height as i32 / CELL_SIZE as i32;
         let column_count = width as i32 / CELL_SIZE as i32;
-        let mut grid: Vec<Vec<Cell>> = Vec::new();
+        let mut grid: Vec<Vec<CellType>> = Vec::new();
         let start = Point::new(column_count - 1, 0);
         let end = Point::new(0, 0);
         for row in 0..row_count {
@@ -329,14 +386,14 @@ impl App for AStar {
                 } else if row == end.y && column == end.x {
                     CellType::End
                 } else {
-                    let rnd = rand() % 4;
+                    let rnd = rand() % 5;
                     if rnd == 0 {
                         CellType::Blocked
                     } else {
                         CellType::Open
                     }
                 };
-                grid[row as usize].push(Cell::new(column, row, cell_type));
+                grid[row as usize].push(cell_type);
             }
         }
         self.row_count = row_count as usize;
