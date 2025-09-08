@@ -31,4 +31,12 @@ impl Cell {
         draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, color);
         draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 2.0, BLACK);
     }
+
+    pub fn toggle_blocked(&mut self) {
+        if self.cell_type == CellType::Open {
+            self.cell_type = CellType::Blocked;
+        } else if self.cell_type == CellType::Blocked {
+            self.cell_type = CellType::Open;
+        }
+    }
 }

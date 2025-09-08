@@ -262,6 +262,12 @@ impl App for AStar {
         // if input::is_key_pressed(KeyCode::S) {
         self.step();
         // }
+        if input::is_mouse_button_pressed(MouseButton::Right) {
+            let pos = input::mouse_position();
+            let column = pos.0 as usize / CELL_SIZE as usize;
+            let row = pos.1 as usize / CELL_SIZE as usize;
+            self.grid[row][column].toggle_blocked();
+        }
     }
 
     fn draw(&self) {
