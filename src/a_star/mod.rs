@@ -27,10 +27,10 @@ pub struct AStar {
 
 struct SimulationState {
     point_to_move_cost: HashMap<Point, MoveCost>,
-    // path: HashSet<Point>,
     open_set: BinaryHeap<(Reverse<i32>, Point)>,
     closed_set: HashSet<Point>,
     point_to_came_from: Vec<(Point, Point)>,
+    came_from: HashMap<Point, Point>,
     path: HashSet<Point>,
 }
 
@@ -50,10 +50,10 @@ impl AStar {
     pub fn new() -> Self {
         let simulation_state = SimulationState {
             point_to_move_cost: HashMap::new(),
-            // path: HashSet::new(),
             open_set: BinaryHeap::new(),
             closed_set: HashSet::new(),
             point_to_came_from: Vec::new(),
+            came_from: HashMap::new(),
             path: HashSet::new(),
         };
         Self {
@@ -68,10 +68,11 @@ impl AStar {
 
     fn find_path(&mut self) {
         self.simulation_state.point_to_move_cost.clear();
-        // self.simulation_state.path.clear();
         self.simulation_state.open_set.clear();
         self.simulation_state.closed_set.clear();
         self.simulation_state.point_to_came_from.clear();
+        self.simulation_state.came_from.clear();
+        self.simulation_state.path.clear();
 
         let start = self.start;
         let end = self.end;
@@ -170,7 +171,6 @@ impl AStar {
                     continue;
                 }
 
-                // self.simulation_state.path.insert(current);
                 self.simulation_state
                     .point_to_came_from
                     .push((neighbour, current));
@@ -179,6 +179,17 @@ impl AStar {
                     estimated,
                     real: current_cost.real + 1,
                 };
+                // second path drawing algorithm
+                if let Some(parent) = self.simulation_state.came_from.get(&neighbour) {
+                    if self.simulation_state.point_to_move_cost[&current].real
+                        < self.simulation_state.point_to_move_cost[parent].real
+                    {
+                        self.simulation_state.came_from.insert(neighbour, current);
+                    }
+                } else {
+                    self.simulation_state.came_from.insert(neighbour, current);
+                }
+                // ========
                 if !self
                     .simulation_state
                     .point_to_move_cost
@@ -205,6 +216,21 @@ impl AStar {
             }
         }
 
+        // second path drawing algorithm
+        if let Some(tile) = self.simulation_state.came_from.get(&self.end) {
+            self.simulation_state.path.clear();
+            self.simulation_state.path.insert(self.end);
+            self.simulation_state.path.insert(*tile);
+            let mut current_parent = *tile;
+            while current_parent != self.start {
+                let new_parent = self.simulation_state.came_from[&current_parent];
+                self.simulation_state.path.insert(new_parent);
+                current_parent = new_parent;
+            }
+        }
+        return;
+
+        // =========
         // Found shortest path
         if let Some(_) = self.simulation_state.point_to_move_cost.get(&self.end) {
             self.simulation_state.path.clear();
@@ -233,9 +259,9 @@ impl App for AStar {
         if input::is_key_pressed(KeyCode::F) {
             self.find_path();
         }
-        if input::is_key_pressed(KeyCode::S) {
-            self.step();
-        }
+        // if input::is_key_pressed(KeyCode::S) {
+        self.step();
+        // }
     }
 
     fn draw(&self) {
@@ -279,7 +305,7 @@ impl App for AStar {
         for point in &self.simulation_state.path {
             let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
             let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-            draw_circle_lines(x, y, 10.0, 3.0, BLUE);
+            draw_circle(x, y, 10.0, BLUE);
         }
     }
 
@@ -287,7 +313,7 @@ impl App for AStar {
         let row_count = height as i32 / CELL_SIZE as i32;
         let column_count = width as i32 / CELL_SIZE as i32;
         let mut grid: Vec<Vec<Cell>> = Vec::new();
-        let start = Point::new(column_count - 1, row_count - 1);
+        let start = Point::new(column_count - 1, 0);
         let end = Point::new(0, 0);
         for row in 0..row_count {
             grid.push(Vec::new());
