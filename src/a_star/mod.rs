@@ -29,6 +29,7 @@ pub struct AStar {
     grid: Vec<Vec<CellType>>,
     start: Point,
     end: Point,
+    can_play: bool,
     is_dragging_start: bool,
     is_dragging_end: bool,
     simulation_state: SimulationState,
@@ -71,6 +72,7 @@ impl AStar {
             grid: Vec::new(),
             start: Point::new(0, 0),
             end: Point::new(0, 0),
+            can_play: false,
             is_dragging_start: false,
             is_dragging_end: false,
             simulation_state,
@@ -84,6 +86,7 @@ impl AStar {
         self.simulation_state.active_connections.clear();
         self.simulation_state.cell_to_came_from.clear();
         self.simulation_state.path.clear();
+        self.can_play = false;
 
         let start_end_diff = (self.start.x - self.end.x).abs() + (self.start.y - self.end.y).abs();
         self.simulation_state
@@ -245,10 +248,17 @@ impl App for AStar {
             }
         }
 
+        if self.can_play {
+            self.step();
+            if let Some(_) = self.simulation_state.cell_to_came_from.get(&self.end) {
+                self.can_play = false;
+            }
+        }
+
         widgets::Window::new(
             hash!(),
             vec2(screen_width() / 2.0, screen_height() / 2.0),
-            vec2(200.0, 100.0),
+            vec2(200.0, 140.0),
         )
         .label("Controls")
         .titlebar(true)
@@ -256,13 +266,22 @@ impl App for AStar {
             if ui.button(None, "Reset") {
                 self.initialize();
             }
+            ui.same_line(0.0);
             if ui.button(None, ">|") {
                 self.step();
             }
+            ui.same_line(0.0);
             if ui.button(None, ">>|") {
+                self.initialize();
                 self.find();
             }
-            ui.label(None, "Drag and drop start and end cells.Click any cell to toggle blocked. Drag this window.");
+            ui.same_line(0.0);
+            if ui.button(None, ">") {
+                self.initialize();
+                self.can_play= true;
+            }
+            let mut data = "Drag and drop start and end\ncells. Click any cell to\ntoggle blocked.\nDrag this window.".to_string();
+            ui.editbox(hash!(), vec2(194.0, 80.0), &mut data);
         });
     }
 
@@ -283,7 +302,7 @@ impl App for AStar {
 
                 if self.simulation_state.cell_to_move_cost.contains_key(&point) {
                     let move_cost = &self.simulation_state.cell_to_move_cost[&point];
-                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, ORANGE);
+                    draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 8.0, PINK);
                     draw_text(
                         &format!("{}", move_cost.real),
                         x + 3.0,
