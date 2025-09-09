@@ -7,7 +7,10 @@ use macroquad::{
     input,
     prelude::*,
     rand::rand,
-    ui::{hash, root_ui, widgets::Group},
+    ui::{
+        hash, root_ui,
+        widgets::{self},
+    },
 };
 use std::{
     cmp::Reverse,
@@ -211,18 +214,6 @@ impl App for AStar {
         if input::is_key_pressed(KeyCode::S) {
             self.step();
         }
-        if input::is_mouse_button_pressed(MouseButton::Right) {
-            let pos = input::mouse_position();
-            let column = pos.0 as usize / CELL_SIZE as usize;
-            let row = pos.1 as usize / CELL_SIZE as usize;
-            if (0..self.grid.len()).contains(&row) && (0..self.grid[0].len()).contains(&column) {
-                if self.grid[row][column] == CellType::Blocked {
-                    self.grid[row][column] = CellType::Open;
-                } else if self.grid[row][column] == CellType::Open {
-                    self.grid[row][column] = CellType::Blocked;
-                }
-            }
-        }
         if input::is_mouse_button_pressed(MouseButton::Left) {
             let pos = input::mouse_position();
             let column = pos.0 as usize / CELL_SIZE as usize;
@@ -233,6 +224,10 @@ impl App for AStar {
                     self.is_dragging_start = true;
                 } else if point == self.end {
                     self.is_dragging_end = true;
+                } else if self.grid[row][column] == CellType::Blocked {
+                    self.grid[row][column] = CellType::Open;
+                } else if self.grid[row][column] == CellType::Open {
+                    self.grid[row][column] = CellType::Blocked;
                 }
             }
         }
@@ -250,8 +245,25 @@ impl App for AStar {
             }
         }
 
-        // Group::new(hash!(), vec2(200.0, 120.0))
-        //     .ui(&mut *root_ui(), |ui| if ui.button(None, ">") {});
+        widgets::Window::new(
+            hash!(),
+            vec2(screen_width() / 2.0, screen_height() / 2.0),
+            vec2(200.0, 100.0),
+        )
+        .label("Controls")
+        .titlebar(true)
+        .ui(&mut *root_ui(), |ui| {
+            if ui.button(None, "Reset") {
+                self.initialize();
+            }
+            if ui.button(None, ">|") {
+                self.step();
+            }
+            if ui.button(None, ">>|") {
+                self.find();
+            }
+            ui.label(None, "Drag and drop start and end cells.Click any cell to toggle blocked. Drag this window.");
+        });
     }
 
     fn draw(&self) {
