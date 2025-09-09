@@ -171,8 +171,8 @@ impl AStar {
         }
 
         self.simulation_state.path.clear();
-        if let Some((child, parent)) = self.simulation_state.active_connections.last() {
-            self.simulation_state.path.insert(*child);
+        if let Some((_child, parent)) = self.simulation_state.active_connections.last() {
+            self.simulation_state.path.insert(*parent);
             let mut current_child = *parent;
             for (new_child, new_parent) in self.simulation_state.active_connections.iter().rev() {
                 if current_child == *new_child {
@@ -299,15 +299,10 @@ impl App for AStar {
                 draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 2.0, BLACK);
             }
         }
-        // for point in &self.simulation_state.closed_set {
-        //     let x = point.x as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-        //     let y = point.y as f32 * CELL_SIZE + CELL_SIZE / 2.0;
-        //     draw_text("C", x, y, 50.0, RED);
-        // }
         for point in &self.simulation_state.path {
             let x = point.x as f32 * CELL_SIZE;
             let y = point.y as f32 * CELL_SIZE;
-            draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, BLUE);
+            draw_rectangle_lines(x, y, CELL_SIZE, CELL_SIZE, 8.0, BLUE);
         }
 
         if self.is_dragging_start {
@@ -323,7 +318,7 @@ impl App for AStar {
         let row_count = height as i32 / CELL_SIZE as i32;
         let column_count = width as i32 / CELL_SIZE as i32;
         let mut grid: Vec<Vec<CellType>> = Vec::new();
-        let start = Point::new(column_count - 1, 0);
+        let start = Point::new(column_count - 1, row_count - 1);
         let end = Point::new(0, 0);
         for row in 0..row_count {
             grid.push(Vec::new());
