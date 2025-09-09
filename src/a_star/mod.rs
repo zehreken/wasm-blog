@@ -3,7 +3,12 @@ use crate::{
     app::App,
     shared::{Point, get_taxicab_neighbours},
 };
-use macroquad::{input, prelude::*, rand::rand};
+use macroquad::{
+    input,
+    prelude::*,
+    rand::rand,
+    ui::{hash, root_ui, widgets::Group},
+};
 use std::{
     cmp::Reverse,
     collections::{BinaryHeap, HashMap, HashSet},
@@ -27,11 +32,11 @@ pub struct AStar {
 }
 
 struct SimulationState {
-    point_to_move_cost: HashMap<Point, MoveCost>,
+    cell_to_move_cost: HashMap<Point, MoveCost>,
     open_set: BinaryHeap<(Reverse<i32>, Point)>,
     closed_set: HashSet<Point>,
-    point_to_came_from: Vec<(Point, Point)>,
-    came_from: HashMap<Point, Point>,
+    active_connections: Vec<(Point, Point)>,
+    cell_to_came_from: HashMap<Point, Point>,
     path: HashSet<Point>,
 }
 
@@ -50,11 +55,11 @@ impl MoveCost {
 impl AStar {
     pub fn new() -> Self {
         let simulation_state = SimulationState {
-            point_to_move_cost: HashMap::new(),
+            cell_to_move_cost: HashMap::new(),
             open_set: BinaryHeap::new(),
             closed_set: HashSet::new(),
-            point_to_came_from: Vec::new(),
-            came_from: HashMap::new(),
+            active_connections: Vec::new(),
+            cell_to_came_from: HashMap::new(),
             path: HashSet::new(),
         };
         Self {
@@ -69,85 +74,39 @@ impl AStar {
         }
     }
 
-    fn find_path(&mut self) {
-        self.simulation_state.point_to_move_cost.clear();
+    fn initialize(&mut self) {
+        self.simulation_state.cell_to_move_cost.clear();
         self.simulation_state.open_set.clear();
         self.simulation_state.closed_set.clear();
-        self.simulation_state.point_to_came_from.clear();
-        self.simulation_state.came_from.clear();
+        self.simulation_state.active_connections.clear();
+        self.simulation_state.cell_to_came_from.clear();
         self.simulation_state.path.clear();
 
-        let start = self.start;
-        let end = self.end;
-        let start_to_diff = (start.x - end.x).abs() + (start.y - end.y).abs();
+        let start_end_diff = (self.start.x - self.end.x).abs() + (self.start.y - self.end.y).abs();
         self.simulation_state
             .open_set
-            .push((Reverse(start_to_diff), start));
-        self.simulation_state.point_to_move_cost.insert(
-            start,
+            .push((Reverse(start_end_diff), self.start));
+        self.simulation_state.cell_to_move_cost.insert(
+            self.start,
             MoveCost {
-                estimated: start_to_diff,
+                estimated: start_end_diff,
                 real: 0,
             },
         );
+    }
 
-        return;
-
-        // self.simulation_state.path.insert(start);
-
-        // while let Some((_total, current)) = self.simulation_state.open_set.pop() {
-        //     if current.x == end.x && current.y == end.y {
-        //         break;
-        //     }
-
-        //     if self.simulation_state.closed_set.contains(&current) {
-        //         continue;
-        //     }
-
-        //     self.simulation_state.closed_set.insert(current);
-
-        //     let current_cost = self.simulation_state.point_to_move_cost[&current];
-
-        //     let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
-        //     for neighbour in neighbours {
-        //         if neighbour.x < 0
-        //             || neighbour.y < 0
-        //             || neighbour.x >= self.column_count as i32
-        //             || neighbour.y >= self.row_count as i32
-        //         {
-        //             continue;
-        //         }
-        //         if self.grid[neighbour.y as usize][neighbour.x as usize].cell_type
-        //             == CellType::Blocked
-        //         {
-        //             continue;
-        //         }
-
-        //         // self.simulation_state.path.insert(current);
-        //         let estimated = (neighbour.x - end.x).abs() + (neighbour.y - end.y).abs();
-        //         let move_cost = MoveCost {
-        //             estimated,
-        //             real: current_cost.real + 1,
-        //         };
-        //         if !self
-        //             .simulation_state
-        //             .point_to_move_cost
-        //             .contains_key(&neighbour)
-        //         {
-        //             self.simulation_state
-        //                 .open_set
-        //                 .push((Reverse(move_cost.total()), neighbour));
-        //             self.simulation_state
-        //                 .point_to_move_cost
-        //                 .insert(neighbour, move_cost);
-        //         }
-        //     }
-        // }
+    fn find(&mut self) {
+        while !self.simulation_state.open_set.is_empty()
+            && !self.simulation_state.closed_set.contains(&self.end)
+        {
+            self.step();
+        }
     }
 
     fn step(&mut self) {
         if let Some((_total, current)) = self.simulation_state.open_set.pop() {
             if current.x == self.end.x && current.y == self.end.y {
+                self.simulation_state.closed_set.insert(current);
                 return;
             }
 
@@ -157,7 +116,7 @@ impl AStar {
 
             self.simulation_state.closed_set.insert(current);
 
-            let current_cost = self.simulation_state.point_to_move_cost[&current];
+            let current_cost = self.simulation_state.cell_to_move_cost[&current];
 
             let neighbours = get_taxicab_neighbours(current.x, current.y, 1);
             for neighbour in neighbours {
@@ -172,84 +131,67 @@ impl AStar {
                     continue;
                 }
 
-                self.simulation_state
-                    .point_to_came_from
-                    .push((neighbour, current));
                 let estimated = (neighbour.x - self.end.x).abs() + (neighbour.y - self.end.y).abs();
                 let move_cost = MoveCost {
                     estimated,
                     real: current_cost.real + 1,
                 };
-                // second path drawing algorithm
-                if let Some(parent) = self.simulation_state.came_from.get(&neighbour) {
-                    if self.simulation_state.point_to_move_cost[&current].real
-                        < self.simulation_state.point_to_move_cost[parent].real
+
+                self.simulation_state
+                    .active_connections
+                    .push((neighbour, current));
+                // final path drawing algorithm
+                if let Some(parent) = self.simulation_state.cell_to_came_from.get(&neighbour) {
+                    if self.simulation_state.cell_to_move_cost[&current].real
+                        < self.simulation_state.cell_to_move_cost[parent].real
                     {
-                        self.simulation_state.came_from.insert(neighbour, current);
+                        self.simulation_state
+                            .cell_to_came_from
+                            .insert(neighbour, current);
                     }
                 } else {
-                    self.simulation_state.came_from.insert(neighbour, current);
+                    self.simulation_state
+                        .cell_to_came_from
+                        .insert(neighbour, current);
                 }
                 // ========
                 if !self
                     .simulation_state
-                    .point_to_move_cost
+                    .cell_to_move_cost
                     .contains_key(&neighbour)
                 {
                     self.simulation_state
                         .open_set
                         .push((Reverse(move_cost.total()), neighbour));
                     self.simulation_state
-                        .point_to_move_cost
+                        .cell_to_move_cost
                         .insert(neighbour, move_cost);
                 }
             }
         }
 
         self.simulation_state.path.clear();
-        if let Some((child, parent)) = self.simulation_state.point_to_came_from.last() {
-            let mut current_end = *child;
-            for (new_child, new_parent) in self.simulation_state.point_to_came_from.iter().rev() {
-                if current_end == *new_child {
+        if let Some((child, parent)) = self.simulation_state.active_connections.last() {
+            self.simulation_state.path.insert(*child);
+            let mut current_child = *parent;
+            for (new_child, new_parent) in self.simulation_state.active_connections.iter().rev() {
+                if current_child == *new_child {
                     self.simulation_state.path.insert(*new_child);
-                    current_end = *new_parent;
+                    self.simulation_state.path.insert(*parent);
+                    current_child = *new_parent;
                 }
             }
         }
 
-        // second path drawing algorithm
-        if let Some(tile) = self.simulation_state.came_from.get(&self.end) {
+        if let Some(tile) = self.simulation_state.cell_to_came_from.get(&self.end) {
             self.simulation_state.path.clear();
             self.simulation_state.path.insert(self.end);
             self.simulation_state.path.insert(*tile);
             let mut current_parent = *tile;
             while current_parent != self.start {
-                let new_parent = self.simulation_state.came_from[&current_parent];
+                let new_parent = self.simulation_state.cell_to_came_from[&current_parent];
                 self.simulation_state.path.insert(new_parent);
                 current_parent = new_parent;
-            }
-        }
-        return;
-
-        // =========
-        // Found shortest path
-        if let Some(_) = self.simulation_state.point_to_move_cost.get(&self.end) {
-            self.simulation_state.path.clear();
-            let mut current_parent = self.end;
-            self.simulation_state.path.insert(self.end);
-            while current_parent != self.start {
-                let neighbours = get_taxicab_neighbours(current_parent.x, current_parent.y, 1);
-                let mut distance = i32::MAX;
-                for neighbour in neighbours {
-                    if let Some(move_cost) =
-                        self.simulation_state.point_to_move_cost.get(&neighbour)
-                        && move_cost.real < distance
-                    {
-                        distance = move_cost.real;
-                        current_parent = neighbour;
-                    }
-                }
-                self.simulation_state.path.insert(current_parent);
             }
         }
     }
@@ -258,11 +200,17 @@ impl AStar {
 impl App for AStar {
     fn update(&mut self) {
         if input::is_key_pressed(KeyCode::F) {
-            self.find_path();
+            self.initialize();
         }
-        // if input::is_key_pressed(KeyCode::S) {
-        self.step();
-        // }
+        if input::is_key_pressed(KeyCode::D) {
+            self.find();
+        }
+        if input::is_key_down(KeyCode::A) {
+            self.step();
+        }
+        if input::is_key_pressed(KeyCode::S) {
+            self.step();
+        }
         if input::is_mouse_button_pressed(MouseButton::Right) {
             let pos = input::mouse_position();
             let column = pos.0 as usize / CELL_SIZE as usize;
@@ -301,6 +249,9 @@ impl App for AStar {
                 self.end = point;
             }
         }
+
+        // Group::new(hash!(), vec2(200.0, 120.0))
+        //     .ui(&mut *root_ui(), |ui| if ui.button(None, ">") {});
     }
 
     fn draw(&self) {
@@ -318,12 +269,8 @@ impl App for AStar {
                     draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, GRAY);
                 }
 
-                if self
-                    .simulation_state
-                    .point_to_move_cost
-                    .contains_key(&point)
-                {
-                    let move_cost = &self.simulation_state.point_to_move_cost[&point];
+                if self.simulation_state.cell_to_move_cost.contains_key(&point) {
+                    let move_cost = &self.simulation_state.cell_to_move_cost[&point];
                     draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, ORANGE);
                     draw_text(
                         &format!("{}", move_cost.real),
