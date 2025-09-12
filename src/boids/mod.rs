@@ -2,7 +2,7 @@ use crate::{
     app::App,
     boids::{boid::Boid, config::*},
 };
-use macroquad::{prelude::*, rand::gen_range};
+use macroquad::{input, prelude::*, rand::gen_range};
 
 mod boid;
 mod config;
@@ -13,6 +13,7 @@ pub fn get_title() -> String {
 
 pub struct Boids {
     boids: [Boid; BOIDS_COUNT],
+    is_paused: bool,
 }
 
 impl Boids {
@@ -23,12 +24,28 @@ impl Boids {
             boids[i].direction = vec2(gen_range(-1.0, 1.0), gen_range(-1.0, 1.0));
         }
 
-        Self { boids }
+        Self {
+            boids,
+            is_paused: false,
+        }
     }
 }
 
 impl App for Boids {
     fn update(&mut self) {
+        if input::is_key_pressed(KeyCode::P) {
+            self.is_paused = !self.is_paused;
+        }
+        if input::is_key_pressed(KeyCode::U) {
+            calculate_targets(&mut self.boids);
+
+            for boid in &mut self.boids {
+                boid.update();
+            }
+        }
+        if self.is_paused {
+            return;
+        }
         calculate_targets(&mut self.boids);
 
         for boid in &mut self.boids {
@@ -39,9 +56,9 @@ impl App for Boids {
     fn draw(&self) {
         for i in 0..BOIDS_COUNT {
             self.boids[i].draw();
-            // if i == 0 {
-            //     self.boids[i].draw_target();
-            // }
+            if i == 0 {
+                self.boids[i].draw_target();
+            }
         }
     }
 

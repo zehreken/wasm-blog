@@ -1,12 +1,8 @@
-use macroquad::{
-    color::{self, BLACK, BLUE, Color, GREEN, RED},
-    input::mouse_position,
-    math::{Vec2, vec2},
-    shapes::{draw_circle, draw_circle_lines, draw_line},
-    window::{screen_height, screen_width},
+use crate::{
+    boids::config::{BOID_SPEED, COHESION_RANGE, SEPARATION_RANGE},
+    shared::MAIN_COLOR,
 };
-
-use crate::{boids::config::BOID_SPEED, shared::MAIN_COLOR};
+use macroquad::{input, prelude::*, time};
 
 #[derive(Clone, Copy)]
 pub struct Boid {
@@ -34,11 +30,18 @@ impl Boid {
         let cohesion_factor = 0.0 * delta_time;
         let separation_factor = 0.0 * delta_time;
 
-        let pointer_diff =
-            (vec2(mouse_position().0, mouse_position().1) - self.position).normalize();
+        let mouse_pos: Vec2 = input::mouse_position().into();
+        let time = time::get_time() as f32 * 2.0;
+        let mut cursor_pos = vec2(
+            mouse_pos.x + time.cos() as f32 * 100.0,
+            mouse_pos.y + time.sin() as f32 * 100.0,
+        );
+        let pointer_diff = (cursor_pos - self.position).normalize();
         let cohesion_diff = (self.cohesion_target - self.position).normalize();
         let separation_diff = (self.separation_target - self.position).normalize();
-        self.direction += pointer_diff * 10.0 + cohesion_diff * 0.1 - separation_diff * 5.0;
+        self.direction += (pointer_diff * 10.0 + cohesion_diff * 0.1 - separation_diff * 7.0)
+            * delta_time
+            * 100.0;
 
         // self.direction += s * 0.01;
         self.direction = self.direction.clamp_length(self.direction.length(), 200.0);
@@ -56,12 +59,9 @@ impl Boid {
 
     pub fn draw_target(&self) {
         draw_circle(self.position.x, self.position.y, 5.0, BLUE);
-        draw_circle_lines(
-            self.cohesion_target.x,
-            self.cohesion_target.y,
-            4.0,
-            2.0,
-            GREEN,
-        );
+        draw_circle_lines(self.position.x, self.position.y, COHESION_RANGE, 1.0, GREEN);
+        draw_circle(self.cohesion_target.x, self.cohesion_target.y, 4.0, GREEN);
+        draw_circle_lines(self.position.x, self.position.y, SEPARATION_RANGE, 1.0, RED);
+        draw_circle(self.separation_target.x, self.separation_target.y, 4.0, RED);
     }
 }
