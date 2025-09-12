@@ -15,7 +15,7 @@ use crate::{
     a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,
     graphic_functions::GraphicFunctions, life::Life, proc_anim::ProcAnim,
 };
-use macroquad::prelude::*;
+use macroquad::{prelude::*, time};
 
 fn config() -> Conf {
     let window_title = life::get_title();

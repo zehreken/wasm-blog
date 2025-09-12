@@ -1,12 +1,12 @@
 use macroquad::{
-    color::{self, BLUE, Color, GREEN, RED},
+    color::{self, BLACK, BLUE, Color, GREEN, RED},
     input::mouse_position,
     math::{Vec2, vec2},
     shapes::{draw_circle, draw_circle_lines, draw_line},
     window::{screen_height, screen_width},
 };
 
-use crate::boids::config::BOID_SPEED;
+use crate::{boids::config::BOID_SPEED, shared::MAIN_COLOR};
 
 #[derive(Clone, Copy)]
 pub struct Boid {
@@ -48,10 +48,10 @@ impl Boid {
 
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
-        draw_circle(x, y, 6.0, Color::from_rgba(255, 157, 11, 255));
+        draw_circle(x, y, 6.0, MAIN_COLOR);
         let end = self.position + self.direction.normalize() * 10.0;
 
-        draw_line(x, y, end.x, end.y, 2.0, GREEN);
+        draw_line(x, y, end.x, end.y, 2.0, BLACK);
     }
 
     pub fn draw_target(&self) {
