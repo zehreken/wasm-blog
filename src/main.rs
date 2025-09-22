@@ -10,6 +10,7 @@ mod graphic_functions;
 mod life;
 mod proc_anim;
 mod shared;
+mod world_angle;
 
 use crate::{
     a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,
