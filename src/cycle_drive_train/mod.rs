@@ -8,26 +8,34 @@ pub fn get_title() -> String {
     return "Cycle".to_owned();
 }
 
-pub struct Cycle {}
+pub struct Cycle {
+    rotation: f32,
+}
 
 impl Cycle {
     pub fn new() -> Self {
-        Self {}
+        Self { rotation: 0.0 }
     }
 }
 
 impl App for Cycle {
     fn update(&mut self) {
-        let rotation = 10.0 * macroquad::time::get_time() as f32;
-        let gear_ratio = FRONT_GEAR_SIZE / REAR_GEAR_SIZE;
-        draw_wheel(200.0, 256.0, 100.0, rotation / REAR_GEAR_SIZE);
-
-        draw_circle_with_line(200.0, 256.0, REAR_GEAR_SIZE, rotation / REAR_GEAR_SIZE);
-
-        draw_circle_with_line(400.0, 256.0, FRONT_GEAR_SIZE, rotation / FRONT_GEAR_SIZE);
+        self.rotation = 10.0 * macroquad::time::get_time() as f32;
     }
 
-    fn draw(&self) {}
+    fn draw(&self) {
+        let gear_ratio = FRONT_GEAR_SIZE / REAR_GEAR_SIZE;
+        draw_wheel(200.0, 256.0, 100.0, self.rotation / REAR_GEAR_SIZE);
+
+        draw_circle_with_line(200.0, 256.0, REAR_GEAR_SIZE, self.rotation / REAR_GEAR_SIZE);
+
+        draw_circle_with_line(
+            400.0,
+            256.0,
+            FRONT_GEAR_SIZE,
+            self.rotation / FRONT_GEAR_SIZE,
+        );
+    }
 
     fn resize(&mut self, width: f32, height: f32) {}
 }

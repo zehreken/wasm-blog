@@ -14,7 +14,7 @@ mod world_angle;
 
 use crate::{
     a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,
-    graphic_functions::GraphicFunctions, life::Life, proc_anim::ProcAnim,
+    graphic_functions::GraphicFunctions, life::Life, proc_anim::ProcAnim, world_angle::WorldAngle,
 };
 use macroquad::{prelude::*, time};
 
@@ -27,6 +27,7 @@ fn config() -> Conf {
     let window_title = boids::get_title();
     let window_title = a_star::get_title();
     let window_title = proc_anim::get_title();
+    let window_title = world_angle::get_title();
 
     Conf {
         window_title,
@@ -49,6 +50,7 @@ async fn main() {
     astar.resize(screen_width(), screen_height());
     let app = Box::new(astar);
     let app = Box::new(ProcAnim::new());
+    let app = Box::new(WorldAngle::new());
     let future = run(app);
 
     future.await
