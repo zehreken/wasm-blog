@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use macroquad::{
     color::BLACK,
     math::{Vec3, vec3},
@@ -41,8 +43,8 @@ impl WorldAngle {
 
 impl App for WorldAngle {
     fn update(&mut self) {
-        let position = vec3(0.0, 0.0, -10.0);
-        let yaw: f32 = 1.18;
+        let position = vec3(0.0, 0.0, -50.0);
+        let yaw: f32 = PI;
         let pitch: f32 = 0.0;
         let front = vec3(
             yaw.cos() * pitch.cos(),
@@ -53,14 +55,14 @@ impl App for WorldAngle {
         set_camera(&Camera3D {
             position,
             up: vec3(0.0, 1.0, 0.0),
-            target: position + front,
+            target: vec3(0.0, 0.0, 0.0),
             ..Default::default()
         });
     }
 
     fn draw(&self) {
-        let center = vec3(screen_width() / 2.0, screen_height() / 2.0, 0.0);
-        draw_sphere_wires(center, 100.0, None, BLACK);
+        let center = vec3(0.0, 0.0, 0.0);
+        draw_sphere_wires(center, 10.0, None, BLACK);
     }
 
     fn resize(&mut self, width: f32, height: f32) {}
