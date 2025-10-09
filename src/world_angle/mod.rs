@@ -17,6 +17,7 @@ pub fn get_title() -> String {
 pub struct WorldAngle {
     coord_a: Coord,
     coord_b: Coord,
+    earth_texture: Texture2D,
 }
 
 struct Coord {
@@ -25,7 +26,8 @@ struct Coord {
 }
 
 impl WorldAngle {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
+        let earth_texture = load_texture("earth.png").await.unwrap();
         Self {
             // Stockholm
             coord_a: Coord {
@@ -37,6 +39,7 @@ impl WorldAngle {
                 latitude: 39.9334,
                 longitude: 32.8597,
             },
+            earth_texture,
         }
     }
 }
@@ -45,15 +48,8 @@ impl App for WorldAngle {
     fn update(&mut self) {}
 
     fn draw(&self) {
-        let position = vec3(0.0, 0.0, -50.0);
-        let yaw: f32 = PI;
-        let pitch: f32 = 0.0;
-        let front = vec3(
-            yaw.cos() * pitch.cos(),
-            pitch.sin(),
-            yaw.sin() * pitch.cos(),
-        )
-        .normalize();
+        let time = macroquad::time::get_time() as f32;
+        let position = vec3(40.0 * time.cos(), 0.0, 40.0 * time.sin());
 
         set_camera(&Camera3D {
             position,
@@ -62,7 +58,7 @@ impl App for WorldAngle {
             ..Default::default()
         });
         let center = vec3(0.0, 0.0, 0.0);
-        draw_sphere_wires(center, 10.0, None, BLACK);
+        draw_sphere(center, 10.0, Some(&self.earth_texture), WHITE);
 
         set_default_camera();
     }

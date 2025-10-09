@@ -51,7 +51,7 @@ async fn main() {
     astar.resize(screen_width(), screen_height());
     let app = Box::new(astar);
     let app = Box::new(ProcAnim::new());
-    let app = Box::new(WorldAngle::new());
+    let app = Box::new(WorldAngle::new().await);
     let future = run(app);
 
     future.await
