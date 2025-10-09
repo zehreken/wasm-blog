@@ -1,12 +1,4 @@
-use std::f32::consts::PI;
-
-use macroquad::{
-    color::BLACK,
-    math::{Vec3, vec3},
-    models::draw_sphere_wires,
-    prelude::*,
-    window::{screen_height, screen_width},
-};
+use macroquad::{math::vec3, prelude::*};
 
 use crate::app::App;
 
