@@ -1,6 +1,5 @@
-use macroquad::{math::vec3, prelude::*};
-
 use crate::app::App;
+use macroquad::{math::vec3, prelude::*};
 
 pub fn get_title() -> String {
     return "World Angle".to_owned();
