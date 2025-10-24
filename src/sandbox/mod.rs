@@ -4,13 +4,11 @@ use crate::{
 };
 use config::*;
 use macroquad::{
-    color::{BLACK, Color, RED, WHITE},
-    input::{
-        KeyCode, MouseButton, is_key_pressed, is_mouse_button_down, is_mouse_button_pressed,
-        mouse_position,
-    },
+    color::{Color, WHITE},
+    input::{KeyCode, MouseButton, is_key_pressed, is_mouse_button_down, mouse_position},
     math::vec2,
     texture::{DrawTextureParams, FilterMode, Image, Texture2D, draw_texture_ex},
+    ui::{hash, root_ui, widgets},
     window::{screen_height, screen_width},
 };
 
@@ -37,7 +35,7 @@ impl Sandbox {
             row_count: height as u32 / PARTICLE_SIZE,
             column_count: width as u32 / PARTICLE_SIZE,
             particle_model: ParticleModel::new(column_count, row_count),
-            image: Image::gen_image_color(column_count as u16, row_count as u16, RED),
+            image: Image::gen_image_color(column_count as u16, row_count as u16, WHITE),
             particle_id: 0,
         }
     }
@@ -45,6 +43,31 @@ impl Sandbox {
 
 impl App for Sandbox {
     fn update(&mut self) {
+        widgets::Window::new(
+            hash!(),
+            vec2(screen_width() / 2.0, screen_height() / 2.0),
+            vec2(160.0, 40.0),
+        )
+        .label("Controls")
+        .titlebar(true)
+        .ui(&mut *root_ui(), |ui| {
+            if ui.button(None, "Sand") {
+                self.particle_id = 0;
+            }
+            ui.same_line(0.0);
+            if ui.button(None, "Water") {
+                self.particle_id = 1;
+            }
+            ui.same_line(0.0);
+            if ui.button(None, "Rock") {
+                self.particle_id = 2;
+            }
+            ui.same_line(0.0);
+            if ui.button(None, "Clear") {
+                self.particle_model.clear();
+            }
+        });
+
         self.particle_model.update();
 
         if is_key_pressed(KeyCode::Key1) {
@@ -103,5 +126,7 @@ impl App for Sandbox {
     fn resize(&mut self, width: f32, height: f32) {
         self.row_count = height as u32 / PARTICLE_SIZE;
         self.column_count = width as u32 / PARTICLE_SIZE;
+        self.particle_model = ParticleModel::new(self.column_count, self.row_count);
+        self.image = Image::gen_image_color(self.column_count as u16, self.row_count as u16, WHITE);
     }
 }
