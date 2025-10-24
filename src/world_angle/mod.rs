@@ -63,18 +63,10 @@ impl App for WorldAngle {
         draw_sphere(center, 10.0, Some(&self.earth_texture), WHITE);
 
         let r = 0.5;
-        let stockholm_pos = coord_to_point_on_sphere(&self.coord_a, 10.0);
-        draw_sphere(stockholm_pos, r, None, GREEN);
-        let ankara_pos = coord_to_point_on_sphere(&self.coord_b, 10.0);
-        draw_sphere(ankara_pos, r, None, YELLOW);
-        let barcelona_pos = coord_to_point_on_sphere(&COORDS[0], 10.0);
-        draw_sphere(barcelona_pos, r, None, RED);
-        let tokyo_pos = coord_to_point_on_sphere(&COORDS[1], 10.0);
-        draw_sphere(tokyo_pos, r, None, BLUE);
-        let sydney_pos = coord_to_point_on_sphere(&COORDS[2], 10.0);
-        draw_sphere(sydney_pos, r, None, PINK);
-        let johannesburg_pos = coord_to_point_on_sphere(&COORDS[3], 10.0);
-        draw_sphere(johannesburg_pos, r, None, GRAY);
+        for coord in COORDS {
+            let pos = coord_to_point_on_sphere(&coord, 10.0);
+            draw_sphere(pos, r, None, GREEN);
+        }
 
         set_default_camera();
 
