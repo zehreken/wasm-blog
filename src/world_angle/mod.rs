@@ -1,6 +1,9 @@
 use std::f32::consts::PI;
 
-use crate::{app::App, world_angle::config::COORDS};
+use crate::{
+    app::App,
+    world_angle::config::{COLORS, COORDS, LATITUDE_OFFSET, LONGITUDE_OFFSET},
+};
 use macroquad::{
     math::vec3,
     prelude::*,
@@ -16,6 +19,7 @@ pub fn get_title() -> String {
 pub struct WorldAngle {
     coord_a: Coord,
     coord_b: Coord,
+    angle: f32,
     earth_texture: Texture2D,
 }
 
@@ -25,11 +29,11 @@ struct Coord {
 }
 
 impl Coord {
-    pub fn new(latitude: f32, longitude: f32) -> Self {
-        Self {
-            latitude: latitude * PI / 180.0,
-            longitude: longitude * PI / 180.0,
-        }
+    pub fn offset_radian(&self) -> Vec2 {
+        vec2(
+            (self.latitude + LATITUDE_OFFSET) * PI / 180.0,
+            (self.longitude + LONGITUDE_OFFSET) * PI / 180.0,
+        )
     }
 }
 
@@ -38,20 +42,33 @@ impl WorldAngle {
         let earth_texture = load_texture("earth.png").await.unwrap();
         Self {
             // Stockholm
-            coord_a: Coord::new(59.3327, -18.0656),
+            coord_a: Coord {
+                latitude: 59.3327,
+                longitude: -18.0656,
+            },
             // Ankara
-            coord_b: Coord::new(39.9334, -32.8597),
+            coord_b: Coord {
+                latitude: 39.9334,
+                longitude: -32.8597,
+            },
+            angle: 0.0,
             earth_texture,
         }
     }
 }
 
 impl App for WorldAngle {
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        if is_key_down(KeyCode::A) {
+            self.angle += 0.005;
+        }
+        if is_key_down(KeyCode::D) {
+            self.angle -= 0.005;
+        }
+    }
 
     fn draw(&self) {
-        let time = macroquad::time::get_time() as f32 / 2.0;
-        let position = vec3(40.0 * time.cos(), 0.0, 40.0 * time.sin());
+        let position = vec3(40.0 * self.angle.cos(), 0.0, 40.0 * self.angle.sin());
 
         set_camera(&Camera3D {
             position,
@@ -62,10 +79,11 @@ impl App for WorldAngle {
         let center = vec3(0.0, 0.0, 0.0);
         draw_sphere(center, 10.0, Some(&self.earth_texture), WHITE);
 
-        let r = 0.5;
+        let r = 0.2;
+        let mut colors = COLORS.iter();
         for coord in COORDS {
-            let pos = coord_to_point_on_sphere(&coord, 10.0);
-            draw_sphere(pos, r, None, GREEN);
+            let pos = coord_to_point_on_sphere(&coord.offset_radian(), 10.0);
+            draw_sphere(pos, r, None, *colors.next().unwrap());
         }
 
         set_default_camera();
@@ -92,10 +110,10 @@ impl App for WorldAngle {
     fn resize(&mut self, width: f32, height: f32) {}
 }
 
-fn coord_to_point_on_sphere(coord: &Coord, radius: f32) -> Vec3 {
-    let x = radius * coord.latitude.cos() * coord.longitude.cos();
-    let y = radius * coord.latitude.sin();
-    let z = radius * coord.latitude.cos() * coord.longitude.sin();
+fn coord_to_point_on_sphere(coord: &Vec2, radius: f32) -> Vec3 {
+    let x = radius * coord.x.cos() * coord.y.cos();
+    let y = radius * coord.x.sin();
+    let z = radius * coord.x.cos() * coord.y.sin();
 
     return vec3(x, y, z);
 }
