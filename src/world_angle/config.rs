@@ -12,6 +12,7 @@ pub const CITIES: &[&str] = &[
     "Sydney",
     "Johannesburg",
     "Mexico City",
+    "Kyiv",
 ];
 // N is +, S is -
 // W is +, E is -
@@ -50,6 +51,11 @@ pub const COORDS: &[Coord] = &[
         // Mexico City 19.4326° N, 99.1332° W
         latitude: 19.4326,
         longitude: 99.1332,
+    },
+    Coord {
+        // Kyiv 50.4504° N, 30.5245° E
+        latitude: 50.4504,
+        longitude: -30.5245,
     },
 ];
 

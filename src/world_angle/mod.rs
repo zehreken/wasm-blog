@@ -2,11 +2,12 @@ use std::f32::consts::PI;
 
 use crate::{
     app::App,
-    world_angle::config::{COLORS, COORDS, LATITUDE_OFFSET, LONGITUDE_OFFSET},
+    world_angle::config::{CITIES, COLORS, COORDS, LATITUDE_OFFSET, LONGITUDE_OFFSET},
 };
 use macroquad::{
     math::vec3,
     prelude::*,
+    time,
     ui::{hash, root_ui, widgets},
 };
 
@@ -61,32 +62,43 @@ impl App for WorldAngle {
     fn update(&mut self) {
         if is_key_down(KeyCode::A) {
             self.angle += 0.005;
-        }
-        if is_key_down(KeyCode::D) {
+        } else if is_key_down(KeyCode::D) {
             self.angle -= 0.005;
+        } else {
+            self.angle += time::get_frame_time() / 10.0;
         }
     }
 
     fn draw(&self) {
         let position = vec3(40.0 * self.angle.cos(), 0.0, 40.0 * self.angle.sin());
 
-        set_camera(&Camera3D {
+        let camera = Camera3D {
             position,
             up: vec3(0.0, 1.0, 0.0),
             target: vec3(0.0, 0.0, 0.0),
             ..Default::default()
-        });
+        };
+        set_camera(&camera);
         let center = vec3(0.0, 0.0, 0.0);
         draw_sphere(center, 10.0, Some(&self.earth_texture), WHITE);
 
         let r = 0.2;
         let mut colors = COLORS.iter();
+        let mut screen_poss = vec![];
         for coord in COORDS {
             let pos = coord_to_point_on_sphere(&coord.offset_radian(), 10.0);
-            draw_sphere(pos, r, None, *colors.next().unwrap());
+            draw_sphere(pos, r, None, WHITE);
+            let screen_pos = world_to_screen_3d(pos, &camera);
+            screen_poss.push(screen_pos);
         }
 
         set_default_camera();
+
+        for (i, screen_pos) in screen_poss.iter().enumerate() {
+            if let Some(sc) = screen_pos {
+                draw_text(CITIES[i], sc.x, sc.y, 20.0, WHITE);
+            }
+        }
 
         widgets::Window::new(
             hash!(),
@@ -116,4 +128,26 @@ fn coord_to_point_on_sphere(coord: &Vec2, radius: f32) -> Vec3 {
     let z = radius * coord.x.cos() * coord.y.sin();
 
     return vec3(x, y, z);
+}
+
+fn world_to_screen_3d(world_pos: Vec3, camera: &Camera3D) -> Option<Vec2> {
+    // Get combined view-projection matrix
+    let view_proj = camera.matrix();
+
+    // Transform world position to clip space
+    let clip_pos = view_proj.transform_point3(world_pos);
+
+    // Check if behind camera
+    if clip_pos.z < 0.0 {
+        return None;
+    }
+
+    // Convert to normalized device coordinates (NDC)
+    let ndc = vec2(clip_pos.x / clip_pos.z, clip_pos.y / clip_pos.z);
+
+    // Convert NDC to screen coordinates
+    Some(Vec2::new(
+        (ndc.x + 1.0) * 0.5 * screen_width(),
+        (1.0 - ndc.y) * 0.5 * screen_height(),
+    ))
 }
