@@ -9,6 +9,7 @@ mod fuzzy_logic;
 mod graphic_functions;
 mod life;
 mod proc_anim;
+mod raycasting_engine;
 mod sandbox;
 mod shared;
 mod world_angle;

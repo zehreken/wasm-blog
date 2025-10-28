@@ -9,7 +9,7 @@ use std::f32::{self, consts::PI};
 mod config;
 
 pub fn get_title() -> String {
-    return "AStar".to_owned();
+    return "Proc Anim".to_owned();
 }
 
 pub struct ProcAnim {

@@ -20,7 +20,7 @@ use std::{
 mod config;
 
 pub fn get_title() -> String {
-    return "AStar".to_owned();
+    return "A Star".to_owned();
 }
 
 pub struct AStar {
