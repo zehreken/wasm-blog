@@ -18,8 +18,8 @@ pub fn get_title() -> String {
 }
 
 pub struct WorldAngle {
-    coord_a: Coord,
-    coord_b: Coord,
+    city_a: usize,
+    city_b: usize,
     angle: f32,
     earth_texture: Texture2D,
 }
@@ -42,16 +42,8 @@ impl WorldAngle {
     pub async fn new() -> Self {
         let earth_texture = load_texture("earth.png").await.unwrap();
         Self {
-            // Stockholm
-            coord_a: Coord {
-                latitude: 59.3327,
-                longitude: -18.0656,
-            },
-            // Ankara
-            coord_b: Coord {
-                latitude: 39.9334,
-                longitude: -32.8597,
-            },
+            city_a: 0,
+            city_b: 1,
             angle: 0.0,
             earth_texture,
         }
@@ -67,6 +59,16 @@ impl App for WorldAngle {
         } else {
             self.angle += time::get_frame_time() / 10.0;
         }
+
+        widgets::Window::new(hash!(), vec2(10.0, 10.0), vec2(240.0, 100.0))
+            .label("Controls")
+            .titlebar(true)
+            .ui(&mut *root_ui(), |ui| {
+                ui.combo_box(hash!(), "City A", config::CITIES, &mut self.city_a);
+                ui.combo_box(hash!(), "City B", config::CITIES, &mut self.city_b);
+                let mut data = "Press A or D to rotate camera.".to_string();
+                ui.editbox(hash!(), vec2(234.0, 30.0), &mut data);
+            });
     }
 
     fn draw(&self) {
@@ -99,24 +101,6 @@ impl App for WorldAngle {
                 draw_text(CITIES[i], sc.x, sc.y, 20.0, WHITE);
             }
         }
-
-        widgets::Window::new(
-            hash!(),
-            vec2(screen_width() / 2.0, screen_height() / 2.0),
-            vec2(200.0, 140.0),
-        )
-        .label("Controls")
-        .titlebar(true)
-        .ui(&mut *root_ui(), |ui| {
-            let mut city_a: usize = 0;
-            ui.combo_box(hash!(), "City A", config::CITIES, &mut city_a);
-            let mut city_b: usize = 0;
-            ui.combo_box(hash!(), "City B", config::CITIES, &mut city_b);
-            if ui.button(None, "Reset") {
-            }
-            let mut data = "Drag and drop start and end\ncells. Click any cell to\ntoggle blocked.\nDrag this window.".to_string();
-            ui.editbox(hash!(), vec2(194.0, 80.0), &mut data);
-        });
     }
 
     fn resize(&mut self, width: f32, height: f32) {}
