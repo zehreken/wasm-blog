@@ -15,42 +15,38 @@ mod sandbox;
 mod shared;
 mod world_angle;
 
-use crate::{
-    a_star::AStar, app::App, boids::Boids, cycle_drive_train::Cycle,
-    graphic_functions::GraphicFunctions, life::Life, proc_anim::ProcAnim, sandbox::Sandbox,
-    world_angle::WorldAngle,
-};
-use macroquad::{prelude::*, time};
+use crate::app::App;
+use macroquad::prelude::*;
 
 fn config() -> Conf {
     let window_title: String = {
-        #[cfg(feature = "life")]
+        #[cfg(feature = "a_star")]
         {
-            life::get_title()
-        }
-        #[cfg(feature = "cycle_drive_train")]
-        {
-            cycle_drive_train::get_title()
-        }
-        #[cfg(feature = "graphic_functions")]
-        {
-            graphic_functions::get_title()
+            a_star::get_title()
         }
         #[cfg(feature = "audio")]
         {
             audio::get_config()
         }
-        #[cfg(feature = "fuzzy_logic")]
-        {
-            fuzzy_logic::get_config()
-        }
         #[cfg(feature = "boids")]
         {
             boids::get_title()
         }
-        #[cfg(feature = "a_star")]
+        #[cfg(feature = "cycle_drive_train")]
         {
-            a_star::get_title()
+            cycle_drive_train::get_title()
+        }
+        #[cfg(feature = "fuzzy_logic")]
+        {
+            fuzzy_logic::get_config()
+        }
+        #[cfg(feature = "graphic_functions")]
+        {
+            graphic_functions::get_title()
+        }
+        #[cfg(feature = "life")]
+        {
+            life::get_title()
         }
         #[cfg(feature = "proc_anim")]
         {
@@ -77,8 +73,18 @@ fn config() -> Conf {
 
 #[macroquad::main(config)]
 async fn main() {
-    #[cfg(feature = "life")]
-    let app = Box::new(Life::new(screen_width(), screen_height()));
+    #[cfg(feature = "a_star")]
+    {
+        let mut astar = AStar::new();
+        astar.resize(screen_width(), screen_height());
+        let app = Box::new(astar);
+    }
+
+    #[cfg(feature = "audio")]
+    let future = audio::run();
+
+    #[cfg(feature = "boids")]
+    let app = Box::new(Boids::new());
 
     #[cfg(feature = "cycle_drive_train")]
     let app = Box::new(Cycle::new());
@@ -86,20 +92,11 @@ async fn main() {
     #[cfg(feature = "graphic_functions")]
     let app = Box::new(GraphicFunctions::new());
 
-    // #[cfg(feature = "audio")]
-    // let future = audio::run();
-    // #[cfg(feature = "fuzzy_logic")]
-    // let future = fuzzy_logic::run();
+    #[cfg(feature = "fuzzy_logic")]
+    let future = fuzzy_logic::run();
 
-    #[cfg(feature = "boids")]
-    let app = Box::new(Boids::new());
-
-    #[cfg(feature = "a_star")]
-    {
-        let mut astar = AStar::new();
-        astar.resize(screen_width(), screen_height());
-        let app = Box::new(astar);
-    }
+    #[cfg(feature = "life")]
+    let app = Box::new(life::Life::new(screen_width(), screen_height()));
 
     #[cfg(feature = "proc_anim")]
     let app = Box::new(ProcAnim::new());
