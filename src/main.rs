@@ -1,4 +1,5 @@
 // cargo build --release --target wasm32-unknown-unknown
+// to use features add: --features boids --no-default-features
 
 mod a_star;
 mod app;
@@ -22,16 +23,48 @@ use crate::{
 use macroquad::{prelude::*, time};
 
 fn config() -> Conf {
-    let window_title = life::get_title();
-    let window_title = cycle_drive_train::get_title();
-    let window_title = graphic_functions::get_title();
-    // audio::get_config()
-    // fuzzy_logic::get_config()
-    let window_title = boids::get_title();
-    let window_title = a_star::get_title();
-    let window_title = proc_anim::get_title();
-    let window_title = sandbox::get_title();
-    let window_title = world_angle::get_title();
+    let window_title: String = {
+        #[cfg(feature = "life")]
+        {
+            life::get_title()
+        }
+        #[cfg(feature = "cycle_drive_train")]
+        {
+            cycle_drive_train::get_title()
+        }
+        #[cfg(feature = "graphic_functions")]
+        {
+            graphic_functions::get_title()
+        }
+        #[cfg(feature = "audio")]
+        {
+            audio::get_config()
+        }
+        #[cfg(feature = "fuzzy_logic")]
+        {
+            fuzzy_logic::get_config()
+        }
+        #[cfg(feature = "boids")]
+        {
+            boids::get_title()
+        }
+        #[cfg(feature = "a_star")]
+        {
+            a_star::get_title()
+        }
+        #[cfg(feature = "proc_anim")]
+        {
+            proc_anim::get_title()
+        }
+        #[cfg(feature = "sandbox")]
+        {
+            sandbox::get_title()
+        }
+        #[cfg(feature = "world_angle")]
+        {
+            world_angle::get_title()
+        }
+    };
 
     Conf {
         window_title,
@@ -44,18 +77,39 @@ fn config() -> Conf {
 
 #[macroquad::main(config)]
 async fn main() {
+    #[cfg(feature = "life")]
     let app = Box::new(Life::new(screen_width(), screen_height()));
+
+    #[cfg(feature = "cycle_drive_train")]
     let app = Box::new(Cycle::new());
+
+    #[cfg(feature = "graphic_functions")]
     let app = Box::new(GraphicFunctions::new());
+
+    // #[cfg(feature = "audio")]
     // let future = audio::run();
+    // #[cfg(feature = "fuzzy_logic")]
     // let future = fuzzy_logic::run();
+
+    #[cfg(feature = "boids")]
     let app = Box::new(Boids::new());
-    let mut astar = AStar::new();
-    astar.resize(screen_width(), screen_height());
-    let app = Box::new(astar);
+
+    #[cfg(feature = "a_star")]
+    {
+        let mut astar = AStar::new();
+        astar.resize(screen_width(), screen_height());
+        let app = Box::new(astar);
+    }
+
+    #[cfg(feature = "proc_anim")]
     let app = Box::new(ProcAnim::new());
+
+    #[cfg(feature = "sandbox")]
     let app = Box::new(Sandbox::new(screen_width(), screen_height()));
+
+    #[cfg(feature = "world_angle")]
     let app = Box::new(WorldAngle::new().await);
+
     let future = run(app);
 
     future.await

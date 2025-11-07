@@ -10,3 +10,16 @@ edition = "2024"
 macroquad = "0.4"
 egui-macroquad = "0.17"
 egui = "0.31"
+
+[features]
+default = ["life"]
+life = []
+cycle_drive_train = []
+graphic_functions = []
+audio = []
+fuzzy_logic = []
+boids = []
+a_star = []
+proc_anim = []
+sandbox = []
+world_angle = []
