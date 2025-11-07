@@ -4,7 +4,7 @@ use crate::app::App;
 const SIZE: usize = 1024 * 2;
 
 pub fn get_title() -> String {
-    return "audio".to_owned();
+    return "Audio".to_owned();
 }
 
 pub struct Audio {

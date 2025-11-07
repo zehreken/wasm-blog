@@ -21,7 +21,8 @@ impl Fauna {
         }
     }
 
-    pub fn update(&mut self, delta_time: f32) {
+    pub fn update(&mut self) {
+        let delta_time = macroquad::time::get_frame_time();
         for cell in &mut self.cells {
             cell.update(delta_time);
         }

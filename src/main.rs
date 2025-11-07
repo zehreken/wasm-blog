@@ -38,7 +38,7 @@ fn config() -> Conf {
         }
         #[cfg(feature = "fuzzy_logic")]
         {
-            fuzzy_logic::get_config()
+            fuzzy_logic::get_title()
         }
         #[cfg(feature = "graphic_functions")]
         {
@@ -93,7 +93,7 @@ async fn main() {
     let app = Box::new(GraphicFunctions::new());
 
     #[cfg(feature = "fuzzy_logic")]
-    let future = fuzzy_logic::run();
+    let app = Box::new(fuzzy_logic::FuzzyLogic::new());
 
     #[cfg(feature = "life")]
     let app = Box::new(life::Life::new(screen_width(), screen_height()));
