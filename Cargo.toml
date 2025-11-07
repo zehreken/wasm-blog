@@ -12,7 +12,7 @@ egui-macroquad = "0.17"
 egui = "0.31"
 
 [features]
-default = ["life"]
+default = ["audio"]
 a_star = []
 audio = []
 boids = []

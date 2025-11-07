@@ -26,7 +26,7 @@ fn config() -> Conf {
         }
         #[cfg(feature = "audio")]
         {
-            audio::get_config()
+            audio::get_title()
         }
         #[cfg(feature = "boids")]
         {
@@ -81,7 +81,7 @@ async fn main() {
     }
 
     #[cfg(feature = "audio")]
-    let future = audio::run();
+    let app = Box::new(audio::Audio::new().await);
 
     #[cfg(feature = "boids")]
     let app = Box::new(Boids::new());
