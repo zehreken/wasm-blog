@@ -87,7 +87,7 @@ async fn main() {
     let app = Box::new(Boids::new());
 
     #[cfg(feature = "cycle_drive_train")]
-    let app = Box::new(Cycle::new());
+    let app = Box::new(cycle_drive_train::Cycle::new());
 
     #[cfg(feature = "graphic_functions")]
     let app = Box::new(GraphicFunctions::new());
@@ -105,7 +105,7 @@ async fn main() {
     let app = Box::new(Sandbox::new(screen_width(), screen_height()));
 
     #[cfg(feature = "world_angle")]
-    let app = Box::new(WorldAngle::new().await);
+    let app = Box::new(world_angle::WorldAngle::new().await);
 
     let future = run(app);
 
@@ -115,6 +115,7 @@ async fn main() {
 async fn run(mut app: Box<dyn App>) {
     let mut width = screen_width();
     let mut height = screen_height();
+
     loop {
         clear_background(WHITE);
 

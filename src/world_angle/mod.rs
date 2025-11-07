@@ -40,7 +40,7 @@ impl Coord {
 
 impl WorldAngle {
     pub async fn new() -> Self {
-        let earth_texture = load_texture("earth.png").await.unwrap();
+        let earth_texture = load_texture("assets/earth.png").await.unwrap();
         Self {
             city_a: 0,
             city_b: 1,

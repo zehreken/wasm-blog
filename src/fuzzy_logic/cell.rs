@@ -1,3 +1,5 @@
+use crate::shared::MAIN_COLOR;
+
 use super::utils::get_random_vector;
 use macroquad::{prelude::*, shapes::draw_circle_lines, text::draw_text};
 
@@ -81,7 +83,7 @@ impl BigCell {
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
         draw_circle_lines(x, y, self.size, 5.0, self.color);
-        draw_circle_lines(self.target.x, self.target.y, 10.0, 5.0, RED);
+        draw_circle_lines(self.target.x, self.target.y, 5.0, 3.0, MAIN_COLOR);
     }
 }
 

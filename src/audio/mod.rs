@@ -27,8 +27,8 @@ impl App for Audio {
         //     .collect();
         // let data = &data[..];
 
-        egui_macroquad::ui(|egui_ctx| {
-            egui::SidePanel::left("").show(egui_ctx, |ui| {
+        egui_macroquad::ui(|ctx| {
+            egui::SidePanel::left("").show(ctx, |ui| {
                 if ui.button("test").clicked() {
                     println!("test");
                     play_sound(

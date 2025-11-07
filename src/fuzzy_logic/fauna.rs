@@ -1,9 +1,6 @@
 use super::cell::*;
-use macroquad::{
-    hash,
-    prelude::*,
-    ui::{root_ui, widgets::Group},
-};
+use crate::shared::MAIN_COLOR;
+use macroquad::prelude::*;
 
 pub struct Fauna {
     cells: Vec<Cell>,
@@ -17,7 +14,7 @@ impl Fauna {
             .collect();
         Self {
             cells,
-            big_cell: BigCell::new(50_f32, Color::from_rgba(255, 157, 11, 255)),
+            big_cell: BigCell::new(50_f32, MAIN_COLOR),
         }
     }
 
@@ -34,18 +31,11 @@ impl Fauna {
             cell.draw();
         }
         self.big_cell.draw();
+
+        egui_macroquad::draw();
     }
 
     pub fn ui(&mut self) {
-        Group::new(hash!(), vec2(200.0, 120.0)).ui(&mut *root_ui(), |ui| {
-            ui.label(None, &format!("fps: {}", macroquad::time::get_fps()));
-            ui.label(None, "distance weight");
-            ui.slider(hash!(), "", 0.0..1.0, &mut self.big_cell.distance_weight);
-
-            ui.label(None, "size weight");
-            ui.slider(hash!(), "", 0.0..1.0, &mut self.big_cell.size_weight);
-        });
-
         draw_text(
             &format!(
                 "{:.2} {:.2} {:.2} {:.2}",
@@ -59,5 +49,15 @@ impl Fauna {
             16.0,
             BLACK,
         );
+
+        egui_macroquad::ui(|ctx| {
+            ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
+            egui::Window::new("Controls").show(ctx, |ui| {
+                ui.label("distance weight");
+                ui.add(egui::Slider::new(&mut self.big_cell.distance_weight, 0.0..=1.0).text(""));
+                ui.label("size weight");
+                ui.add(egui::Slider::new(&mut self.big_cell.size_weight, 0.0..=1.0).text(""));
+            });
+        });
     }
 }
