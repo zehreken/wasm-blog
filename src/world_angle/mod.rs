@@ -2,14 +2,9 @@ use std::f32::consts::PI;
 
 use crate::{
     app::App,
-    world_angle::config::{CITIES, COLORS, COORDS, LATITUDE_OFFSET, LONGITUDE_OFFSET},
+    world_angle::config::{CITIES, COLORS, COORDS, City, LATITUDE_OFFSET, LONGITUDE_OFFSET},
 };
-use macroquad::{
-    math::vec3,
-    prelude::*,
-    time,
-    ui::{hash, root_ui, widgets},
-};
+use macroquad::{math::vec3, prelude::*, time};
 
 mod config;
 
@@ -18,8 +13,8 @@ pub fn get_title() -> String {
 }
 
 pub struct WorldAngle {
-    city_a: usize,
-    city_b: usize,
+    city_a: City,
+    city_b: City,
     angle: f32,
     earth_texture: Texture2D,
 }
@@ -42,8 +37,8 @@ impl WorldAngle {
     pub async fn new() -> Self {
         let earth_texture = load_texture("assets/earth.png").await.unwrap();
         Self {
-            city_a: 0,
-            city_b: 1,
+            city_a: City::Ankara,
+            city_b: City::Stockholm,
             angle: 0.0,
             earth_texture,
         }
@@ -60,15 +55,55 @@ impl App for WorldAngle {
             self.angle += time::get_frame_time() / 10.0;
         }
 
-        widgets::Window::new(hash!(), vec2(10.0, 10.0), vec2(240.0, 100.0))
-            .label("Controls")
-            .titlebar(true)
-            .ui(&mut *root_ui(), |ui| {
-                ui.combo_box(hash!(), "City A", config::CITIES, &mut self.city_a);
-                ui.combo_box(hash!(), "City B", config::CITIES, &mut self.city_b);
-                let mut data = "Press A or D to rotate camera.".to_string();
-                ui.editbox(hash!(), vec2(234.0, 30.0), &mut data);
-            });
+        let mut egui_wants_mouse = false;
+        egui_macroquad::ui(|ctx| {
+            egui_wants_mouse = ctx.wants_pointer_input();
+            ctx.set_theme(egui::Theme::Light);
+            ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
+            egui::Window::new("Controls")
+                .resizable(false)
+                .max_width(200.0)
+                .show(ctx, |ui| {
+                    egui::ComboBox::from_label("City A")
+                        .selected_text(format!("{:?}", self.city_a))
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.city_a, City::Ankara, "Ankara");
+                            ui.selectable_value(&mut self.city_a, City::Stockholm, "Stockholm");
+                            ui.selectable_value(&mut self.city_a, City::Barcelona, "Barcelona");
+                            ui.selectable_value(&mut self.city_a, City::Tokyo, "Tokyo");
+                            ui.selectable_value(&mut self.city_a, City::Sydney, "Sydney");
+                            ui.selectable_value(
+                                &mut self.city_a,
+                                City::Johannesburg,
+                                "Johannesburg",
+                            );
+                            ui.selectable_value(&mut self.city_a, City::MexicoCity, "Mexico City");
+                            ui.selectable_value(&mut self.city_a, City::Kyiv, "Kyiv");
+                        });
+                    egui::ComboBox::from_label("City B")
+                        .selected_text(format!("{:?}", self.city_b))
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.city_b, City::Ankara, "Ankara");
+                            ui.selectable_value(&mut self.city_b, City::Stockholm, "Stockholm");
+                            ui.selectable_value(&mut self.city_b, City::Barcelona, "Barcelona");
+                            ui.selectable_value(&mut self.city_b, City::Tokyo, "Tokyo");
+                            ui.selectable_value(&mut self.city_b, City::Sydney, "Sydney");
+                            ui.selectable_value(
+                                &mut self.city_b,
+                                City::Johannesburg,
+                                "Johannesburg",
+                            );
+                            ui.selectable_value(&mut self.city_b, City::MexicoCity, "Mexico City");
+                            ui.selectable_value(&mut self.city_b, City::Kyiv, "Kyiv");
+                        });
+                    ui.label("Press A or D to rotate camera.")
+                });
+        });
+
+        // Prevents mouse clicks going through the ui
+        if egui_wants_mouse {
+            return;
+        }
     }
 
     fn draw(&self) {
@@ -101,9 +136,11 @@ impl App for WorldAngle {
                 draw_text(CITIES[i], sc.x, sc.y, 20.0, WHITE);
             }
         }
+
+        egui_macroquad::draw();
     }
 
-    fn resize(&mut self, width: f32, height: f32) {}
+    fn resize(&mut self, _width: f32, _height: f32) {}
 }
 
 fn coord_to_point_on_sphere(coord: &Vec2, radius: f32) -> Vec3 {

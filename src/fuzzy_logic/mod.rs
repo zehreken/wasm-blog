@@ -32,5 +32,5 @@ impl App for FuzzyLogic {
         self.fauna.draw();
     }
 
-    fn resize(&mut self, width: f32, height: f32) {}
+    fn resize(&mut self, _width: f32, _height: f32) {}
 }

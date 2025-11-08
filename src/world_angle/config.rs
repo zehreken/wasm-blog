@@ -4,6 +4,18 @@ use macroquad::color::{BLUE, Color, GRAY, GREEN, MAGENTA, ORANGE, RED, YELLOW};
 pub const LATITUDE_OFFSET: f32 = -7.0;
 pub const LONGITUDE_OFFSET: f32 = -90.0;
 
+#[derive(Debug, PartialEq)]
+pub enum City {
+    Ankara,
+    Stockholm,
+    Barcelona,
+    Tokyo,
+    Sydney,
+    Johannesburg,
+    MexicoCity,
+    Kyiv,
+}
+
 pub const CITIES: &[&str] = &[
     "Ankara",
     "Stockholm",

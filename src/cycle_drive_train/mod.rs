@@ -37,7 +37,7 @@ impl App for Cycle {
         );
     }
 
-    fn resize(&mut self, width: f32, height: f32) {}
+    fn resize(&mut self, _width: f32, _height: f32) {}
 }
 
 fn draw_wheel(x: f32, y: f32, radius: f32, rotation: f32) {

@@ -62,7 +62,7 @@ impl App for Boids {
         }
     }
 
-    fn resize(&mut self, width: f32, height: f32) {}
+    fn resize(&mut self, _width: f32, _height: f32) {}
 }
 
 fn calculate_targets(boids: &mut [Boid; BOIDS_COUNT]) {
