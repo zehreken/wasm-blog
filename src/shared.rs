@@ -1,7 +1,8 @@
 use macroquad::color::Color;
 use std::fmt;
 
-pub const MAIN_COLOR: Color = Color::from_hex(0xFF0066);
+pub const BG_COLOR: Color = Color::from_hex(0xd9d9d9);
+pub const MAIN_COLOR: Color = Color::from_hex(0xff0066);
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Point {

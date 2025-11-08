@@ -15,7 +15,7 @@ mod sandbox;
 mod shared;
 mod world_angle;
 
-use crate::app::App;
+use crate::{app::App, shared::BG_COLOR};
 use macroquad::prelude::*;
 
 fn config() -> Conf {
@@ -117,7 +117,7 @@ async fn run(mut app: Box<dyn App>) {
     let mut height = screen_height();
 
     loop {
-        clear_background(WHITE);
+        clear_background(BG_COLOR);
 
         if (width - screen_width()).abs() > 1.0 || (height - screen_height()).abs() > 1.0 {
             width = screen_width();
