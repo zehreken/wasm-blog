@@ -53,7 +53,7 @@ impl App for Sandbox {
                 let index = row * self.column_count + column;
                 if let Some(p) = &self.particle_model._particles[index as usize] {
                     self.image
-                        .set_pixel(column, row, Color::from_hex(p.get_properties().color));
+                        .set_pixel(column, row, Color::from_hex(p.get_properties().color()));
                 } else {
                     self.image.set_pixel(column, row, WHITE);
                 }

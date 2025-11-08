@@ -8,7 +8,7 @@ type SimulationResult = (
 #[derive(Clone)]
 pub struct ParticleProperties {
     pub kind: u8,
-    pub color: u32,
+    color: u32,
     pub density: u8,
     // pub flammable: bool,
 }
@@ -240,6 +240,19 @@ impl ParticleProperties {
             color: if rand() % 2 == 0 { 0x595959 } else { 0x797979 },
             density: 10,
         }
+    }
+
+    pub fn color(&self) -> u32 {
+        return match self.kind {
+            1 => {
+                if rand() % 2 == 0 {
+                    0x0EBFE9
+                } else {
+                    0x0B99BA
+                }
+            }
+            _ => self.color,
+        };
     }
 }
 
