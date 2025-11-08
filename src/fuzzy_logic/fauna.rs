@@ -49,8 +49,8 @@ impl Fauna {
             16.0,
             BLACK,
         );
-
         egui_macroquad::ui(|ctx| {
+            ctx.set_theme(egui::Theme::Light);
             ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
             egui::Window::new("Controls").show(ctx, |ui| {
                 ui.label("distance weight");

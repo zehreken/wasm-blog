@@ -74,23 +74,21 @@ fn config() -> Conf {
 #[macroquad::main(config)]
 async fn main() {
     #[cfg(feature = "a_star")]
-    {
-        let mut astar = AStar::new();
-        astar.resize(screen_width(), screen_height());
-        let app = Box::new(astar);
-    }
+    let mut astar = a_star::AStar::new();
+    astar.resize(screen_width(), screen_height());
+    let app = Box::new(astar);
 
     #[cfg(feature = "audio")]
     let app = Box::new(audio::Audio::new().await);
 
     #[cfg(feature = "boids")]
-    let app = Box::new(Boids::new());
+    let app = Box::new(boids::Boids::new());
 
     #[cfg(feature = "cycle_drive_train")]
     let app = Box::new(cycle_drive_train::Cycle::new());
 
     #[cfg(feature = "graphic_functions")]
-    let app = Box::new(GraphicFunctions::new());
+    let app = Box::new(graphic_functions::GraphicFunctions::new());
 
     #[cfg(feature = "fuzzy_logic")]
     let app = Box::new(fuzzy_logic::FuzzyLogic::new());
@@ -99,10 +97,10 @@ async fn main() {
     let app = Box::new(life::Life::new(screen_width(), screen_height()));
 
     #[cfg(feature = "proc_anim")]
-    let app = Box::new(ProcAnim::new());
+    let app = Box::new(proc_anim::ProcAnim::new());
 
     #[cfg(feature = "sandbox")]
-    let app = Box::new(Sandbox::new(screen_width(), screen_height()));
+    let app = Box::new(sandbox::Sandbox::new(screen_width(), screen_height()));
 
     #[cfg(feature = "world_angle")]
     let app = Box::new(world_angle::WorldAngle::new().await);

@@ -3,15 +3,7 @@ use crate::{
     app::App,
     shared::{Point, get_taxicab_neighbours},
 };
-use macroquad::{
-    input,
-    prelude::*,
-    rand::rand,
-    ui::{
-        hash, root_ui,
-        widgets::{self},
-    },
-};
+use macroquad::{input, prelude::*, rand::rand};
 use std::{
     cmp::Reverse,
     collections::{BinaryHeap, HashMap, HashSet},
@@ -217,6 +209,43 @@ impl App for AStar {
         if input::is_key_pressed(KeyCode::S) {
             self.step();
         }
+        if self.can_play {
+            self.step();
+            if let Some(_) = self.simulation_state.cell_to_came_from.get(&self.end) {
+                self.can_play = false;
+            }
+        }
+
+        let mut egui_wants_mouse = false;
+        egui_macroquad::ui(|ctx| {
+            egui_wants_mouse = ctx.wants_pointer_input();
+            ctx.set_theme(egui::Theme::Light);
+            ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
+            egui::Window::new("Controls").resizable(false).max_width(200.0).show(ctx, |ui| {
+                ui.horizontal(|ui| {
+                    if ui.button("Reset").clicked() {
+                        self.initialize();
+                    }
+                    if ui.button(">|").clicked() {
+                        self.step();
+                    }
+                    if ui.button(">>|").clicked() {
+                        self.initialize();
+                        self.find();
+                    }
+                    if ui.button(">").clicked() {
+                        self.initialize();
+                        self.can_play = true;
+                    }
+                });
+                ui.label("Drag and drop start and end cells. Click any cell to toggle blocked. Drag this window.");
+            });
+        });
+
+        // Prevents mouse clicks going through the ui
+        if egui_wants_mouse {
+            return;
+        }
         if input::is_mouse_button_pressed(MouseButton::Left) {
             let pos = input::mouse_position();
             let column = pos.0 as usize / CELL_SIZE as usize;
@@ -247,42 +276,6 @@ impl App for AStar {
                 self.end = point;
             }
         }
-
-        if self.can_play {
-            self.step();
-            if let Some(_) = self.simulation_state.cell_to_came_from.get(&self.end) {
-                self.can_play = false;
-            }
-        }
-
-        widgets::Window::new(
-            hash!(),
-            vec2(screen_width() / 2.0, screen_height() / 2.0),
-            vec2(200.0, 140.0),
-        )
-        .label("Controls")
-        .titlebar(true)
-        .ui(&mut *root_ui(), |ui| {
-            if ui.button(None, "Reset") {
-                self.initialize();
-            }
-            ui.same_line(0.0);
-            if ui.button(None, ">|") {
-                self.step();
-            }
-            ui.same_line(0.0);
-            if ui.button(None, ">>|") {
-                self.initialize();
-                self.find();
-            }
-            ui.same_line(0.0);
-            if ui.button(None, ">") {
-                self.initialize();
-                self.can_play= true;
-            }
-            let mut data = "Drag and drop start and end\ncells. Click any cell to\ntoggle blocked.\nDrag this window.".to_string();
-            ui.editbox(hash!(), vec2(194.0, 80.0), &mut data);
-        });
     }
 
     fn draw(&self) {
@@ -343,6 +336,8 @@ impl App for AStar {
             let (x, y) = input::mouse_position();
             draw_circle(x, y, 10.0, RED);
         }
+
+        egui_macroquad::draw();
     }
 
     fn resize(&mut self, width: f32, height: f32) {
