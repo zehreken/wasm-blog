@@ -8,7 +8,6 @@ use macroquad::{
     input::{KeyCode, MouseButton, is_key_pressed, is_mouse_button_down, mouse_position},
     math::vec2,
     texture::{DrawTextureParams, FilterMode, Image, Texture2D, draw_texture_ex},
-    ui::{hash, root_ui, widgets},
     window::{screen_height, screen_width},
 };
 
@@ -24,7 +23,7 @@ pub struct Sandbox {
     column_count: u32,
     particle_model: ParticleModel,
     image: Image,
-    brush_id: usize,
+    brush_id: BrushId,
     brush_size: u8,
     particle_id: u8,
 }
@@ -38,7 +37,7 @@ impl Sandbox {
             column_count: width as u32 / PARTICLE_SIZE,
             particle_model: ParticleModel::new(column_count, row_count),
             image: Image::gen_image_color(column_count as u16, row_count as u16, WHITE),
-            brush_id: 0,
+            brush_id: BrushId::_1,
             brush_size: 0,
             particle_id: 0,
         }
@@ -47,33 +46,6 @@ impl Sandbox {
 
 impl App for Sandbox {
     fn update(&mut self) {
-        widgets::Window::new(
-            hash!(),
-            vec2(screen_width() / 2.0, screen_height() / 2.0),
-            vec2(158.0, 64.0),
-        )
-        .label("Controls")
-        .titlebar(true)
-        .ui(&mut *root_ui(), |ui| {
-            if ui.button(None, "Sand") {
-                self.particle_id = 0;
-            }
-            ui.same_line(0.0);
-            if ui.button(None, "Water") {
-                self.particle_id = 1;
-            }
-            ui.same_line(0.0);
-            if ui.button(None, "Rock") {
-                self.particle_id = 2;
-            }
-            ui.same_line(0.0);
-            if ui.button(None, "Clear") {
-                self.particle_model.clear();
-            }
-            ui.combo_box(hash!(), "Brush size", BRUSH_LABELS, &mut self.brush_id);
-            self.brush_size = BRUSH_SIZES[self.brush_id];
-        });
-
         self.particle_model.update();
 
         for row in 0..self.row_count {
@@ -88,10 +60,6 @@ impl App for Sandbox {
             }
         }
 
-        if root_ui().is_mouse_over(mouse_position().into()) {
-            return;
-        }
-
         if is_key_pressed(KeyCode::Key1) {
             self.particle_id = 0;
         }
@@ -100,6 +68,51 @@ impl App for Sandbox {
         }
         if is_key_pressed(KeyCode::Key3) {
             self.particle_id = 2;
+        }
+
+        let mut egui_wants_mouse = false;
+        egui_macroquad::ui(|ctx| {
+            egui_wants_mouse = ctx.wants_pointer_input();
+            ctx.set_theme(egui::Theme::Light);
+            ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
+            egui::Window::new("Controls")
+                .resizable(false)
+                .max_width(200.0)
+                .show(ctx, |ui| {
+                    ui.horizontal(|ui| {
+                        if ui.button("Sand").clicked() {
+                            self.particle_id = 0;
+                        }
+                        if ui.button("Water").clicked() {
+                            self.particle_id = 1;
+                        }
+                        if ui.button("Rock").clicked() {
+                            self.particle_id = 2;
+                        }
+                        if ui.button("Erase").clicked() {
+                            self.particle_id = u8::MAX;
+                        }
+                        if ui.button("Clear").clicked() {
+                            self.particle_model.clear();
+                        }
+                    });
+                    // ui..combo_box(hash!(), "Brush size", BRUSH_LABELS, &mut self.brush_id);
+                    egui::ComboBox::from_label("Brush size")
+                        .selected_text(format!("{:?}", self.brush_id))
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.brush_id, BrushId::_1, "1");
+                            ui.selectable_value(&mut self.brush_id, BrushId::_2, "2");
+                            ui.selectable_value(&mut self.brush_id, BrushId::_4, "4");
+                            ui.selectable_value(&mut self.brush_id, BrushId::_8, "8");
+                            ui.selectable_value(&mut self.brush_id, BrushId::_16, "16");
+                        });
+                    self.brush_size = BRUSH_SIZES[get_brush_index(&self.brush_id)];
+                });
+        });
+
+        // Prevents mouse clicks going through the ui
+        if egui_wants_mouse {
+            return;
         }
 
         if is_mouse_button_down(MouseButton::Left) {
@@ -143,6 +156,8 @@ impl App for Sandbox {
                 ..Default::default()
             },
         );
+
+        egui_macroquad::draw();
     }
 
     fn resize(&mut self, width: f32, height: f32) {
