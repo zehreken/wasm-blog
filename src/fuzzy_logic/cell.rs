@@ -1,6 +1,5 @@
-use crate::shared::MAIN_COLOR;
-
 use super::utils::get_random_vector;
+use crate::shared::MAIN_COLOR;
 use macroquad::{prelude::*, shapes::draw_circle_lines, text::draw_text};
 
 const VELOCITY: f32 = 30.0;
@@ -127,13 +126,12 @@ impl Cell {
 
     pub fn draw(&self) {
         let (x, y) = (self.position.x, self.position.y);
-        draw_text(
-            &format!("{}|{}", self.id, self.size),
-            x - 12.0,
-            y + self.size + 12.0,
-            16.0,
-            RED,
-        );
+        let text = if self.is_alive {
+            &format!("{}|{}", self.id, self.size)
+        } else {
+            "dead"
+        };
+        draw_text(text, x - 12.0, y + self.size + 12.0, 16.0, RED);
         draw_circle_lines(x, y, self.size, 3.0, self.color);
     }
 

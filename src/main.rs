@@ -74,9 +74,11 @@ fn config() -> Conf {
 #[macroquad::main(config)]
 async fn main() {
     #[cfg(feature = "a_star")]
-    let mut astar = a_star::AStar::new();
-    astar.resize(screen_width(), screen_height());
-    let app = Box::new(astar);
+    {
+        let mut astar = a_star::AStar::new();
+        astar.resize(screen_width(), screen_height());
+        let app = Box::new(astar);
+    }
 
     #[cfg(feature = "audio")]
     let app = Box::new(audio::Audio::new().await);

@@ -52,12 +52,16 @@ impl Fauna {
         egui_macroquad::ui(|ctx| {
             ctx.set_theme(egui::Theme::Light);
             ctx.style_mut(|style| style.visuals.window_shadow = egui::Shadow::NONE);
-            egui::Window::new("Controls").show(ctx, |ui| {
-                ui.label("distance weight");
-                ui.add(egui::Slider::new(&mut self.big_cell.distance_weight, 0.0..=1.0).text(""));
-                ui.label("size weight");
-                ui.add(egui::Slider::new(&mut self.big_cell.size_weight, 0.0..=1.0).text(""));
-            });
+            egui::Window::new("Controls")
+                .resizable(false)
+                .show(ctx, |ui| {
+                    ui.label("distance weight");
+                    ui.add(
+                        egui::Slider::new(&mut self.big_cell.distance_weight, 0.0..=1.0).text(""),
+                    );
+                    ui.label("size weight");
+                    ui.add(egui::Slider::new(&mut self.big_cell.size_weight, 0.0..=1.0).text(""));
+                });
         });
     }
 }
