@@ -64,9 +64,10 @@ fn config() -> Conf {
 
     Conf {
         window_title,
-        window_width: 512,
-        window_height: 512,
+        window_width: 1024,
+        window_height: 1024,
         fullscreen: false,
+        high_dpi: true,
         ..Default::default()
     }
 }

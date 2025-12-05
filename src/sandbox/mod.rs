@@ -1,6 +1,7 @@
 use crate::{
     app::App,
     sandbox::particle::{Particle, ParticleModel, Rock, Sand, Water},
+    shared::BG_COLOR,
 };
 use config::*;
 use macroquad::{
@@ -55,7 +56,7 @@ impl App for Sandbox {
                     self.image
                         .set_pixel(column, row, Color::from_hex(p.get_properties().color()));
                 } else {
-                    self.image.set_pixel(column, row, WHITE);
+                    self.image.set_pixel(column, row, BG_COLOR);
                 }
             }
         }
