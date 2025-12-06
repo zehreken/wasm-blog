@@ -12,7 +12,7 @@ egui-macroquad = "0.17"
 egui = "0.31"
 
 [features]
-default = ["world_angle"]
+default = ["perceptron"]
 a_star = []
 audio = []
 boids = []
@@ -20,6 +20,7 @@ cycle_drive_train = []
 fuzzy_logic = []
 graphic_functions = []
 life = []
+perceptron = []
 proc_anim = []
 sandbox = []
 world_angle = []

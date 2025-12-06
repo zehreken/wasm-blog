@@ -9,6 +9,7 @@ mod cycle_drive_train;
 mod fuzzy_logic;
 mod graphic_functions;
 mod life;
+mod perceptron;
 mod proc_anim;
 mod raycasting_engine;
 mod sandbox;
@@ -47,6 +48,10 @@ fn config() -> Conf {
         #[cfg(feature = "life")]
         {
             life::get_title()
+        }
+        #[cfg(feature = "perceptron")]
+        {
+            perceptron::get_title()
         }
         #[cfg(feature = "proc_anim")]
         {
@@ -98,6 +103,9 @@ async fn main() {
 
     #[cfg(feature = "life")]
     let app = Box::new(life::Life::new(screen_width(), screen_height()));
+
+    #[cfg(feature = "perceptron")]
+    let app = Box::new(perceptron::Perceptron::new());
 
     #[cfg(feature = "proc_anim")]
     let app = Box::new(proc_anim::ProcAnim::new());
