@@ -117,22 +117,24 @@ impl App for Perceptron {
 }
 
 fn calculate(p: &mut Perceptron) {
-    if p.input_1 < 2 && p.input_2 < 2 && p.desired_output < 2 {
-        let sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
-        let correct = if sum > p.threshold {
-            p.output = 1;
-            p.desired_output == p.output
-        } else {
-            p.output = 0;
-            p.desired_output == p.output
-        };
-        if !correct {
-            if p.input_1 > 0 {
-                p.weight_1_1 += (p.desired_output - p.output) as f32 * p.learning_rate;
-            }
-            if p.input_2 > 0 {
-                p.weight_1_2 += (p.desired_output - p.output) as f32 * p.learning_rate;
-            }
+    if p.desired_output == 0 {
+        return;
+    }
+    let mut sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
+    while sum < p.threshold {
+        sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
+        if p.input_1 > 0 {
+            p.weight_1_1 += (p.desired_output - p.output) as f32 * p.learning_rate;
+        }
+        if p.input_2 > 0 {
+            p.weight_1_2 += (p.desired_output - p.output) as f32 * p.learning_rate;
         }
     }
+    let correct = if sum > p.threshold {
+        p.output = 1;
+        p.desired_output == p.output
+    } else {
+        p.output = 0;
+        p.desired_output == p.output
+    };
 }
