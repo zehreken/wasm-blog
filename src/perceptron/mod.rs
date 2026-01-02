@@ -7,6 +7,8 @@ use macroquad::{
     text::draw_text,
 };
 
+mod matrix;
+
 pub fn get_title() -> String {
     return "Perceptron".to_owned();
 }
@@ -117,7 +119,7 @@ impl App for Perceptron {
 }
 
 fn calculate(p: &mut Perceptron) {
-    if p.desired_output == 0 {
+    if p.desired_output == 0 || (p.input_1 == 0 && p.input_2 == 0) {
         return;
     }
     let mut sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
@@ -129,12 +131,7 @@ fn calculate(p: &mut Perceptron) {
         if p.input_2 > 0 {
             p.weight_1_2 += (p.desired_output - p.output) as f32 * p.learning_rate;
         }
-    }
-    let correct = if sum > p.threshold {
-        p.output = 1;
-        p.desired_output == p.output
-    } else {
         p.output = 0;
-        p.desired_output == p.output
-    };
+    }
+    p.output = 1;
 }

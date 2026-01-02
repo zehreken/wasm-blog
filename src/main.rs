@@ -57,6 +57,8 @@ fn config() -> Conf {
         {
             proc_anim::get_title()
         }
+        #[cfg(feature = "raycasting_engine")]
+        {}
         #[cfg(feature = "sandbox")]
         {
             sandbox::get_title()
