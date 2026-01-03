@@ -1,4 +1,4 @@
-use crate::{app::App, shared::MAIN_COLOR};
+use crate::{app::App, perceptron::matrix::Matrix, shared::MAIN_COLOR};
 use macroquad::{
     color::BLACK,
     input::{self, KeyCode},
@@ -122,9 +122,14 @@ fn calculate(p: &mut Perceptron) {
     if p.desired_output == 0 || (p.input_1 == 0 && p.input_2 == 0) {
         return;
     }
-    let mut sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
-    while sum < p.threshold {
-        sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
+    let input = Matrix::new(vec![vec![p.input_1 as f32, p.input_2 as f32]]);
+    let weights = Matrix::new(vec![vec![p.weight_1_1], vec![p.weight_1_2]]);
+    let mut output = input.multiply(&weights);
+    // let mut sum = p.input_1 as f32 * p.weight_1_1 + p.input_2 as f32 * p.weight_1_2;
+    while output.mat[0][0] < p.threshold {
+        let input = Matrix::new(vec![vec![p.input_1 as f32, p.input_2 as f32]]);
+        let weights = Matrix::new(vec![vec![p.weight_1_1], vec![p.weight_1_2]]);
+        output = input.multiply(&weights);
         if p.input_1 > 0 {
             p.weight_1_1 += (p.desired_output - p.output) as f32 * p.learning_rate;
         }
